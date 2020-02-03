@@ -1,0 +1,43 @@
+Package: hierarchicell
+Title: Simulating Compositional, Cell-Type Specific, and Hierarchical scRNA-seq data
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Kip",
+           family = "Zimmerman",
+           role = c("aut", "cre"),
+           email = "kdzimmer@wakehealth.edu",
+           comment = c(ORCID = "0000-0002-2943-6612"))
+Description: The hierarchicell package estimates important parameters from single-cell
+    RNA-seq expression counts before simulating expression data that is
+    compositional, cell-type specific, and hierarchical in nature. With the
+    simulated data, hierarchicell is then able to compute power calculations
+    under a variety of conditions. The package consists of four important
+    categories of functions: data loading and cleaning, empirical estimation of
+    distributions, simulating expression data, and computing power.
+License: CC0
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
+Imports: 
+    fitdistrplus,
+    ggplot2,
+    MASS,
+    tidyr,
+    gdata,
+    Seurat,
+    data.table,
+    EnvStats,
+    purrr,
+    dplyr,
+    MAST,
+    SummarizedExperiment,
+    BiocGenerics,
+    ROTS,
+    VGAM,
+    geepack,
+    glmmTMB,
+    sva,
+    monocle,
+    stats,
+    methods,
+    grDevices
