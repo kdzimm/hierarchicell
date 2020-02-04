@@ -102,6 +102,16 @@ NULL
 #'  calling rates (due to improved methods or improved cell viability) and
 #'  thereby lower dropout rates. Defaults to 0.
 #'
+#'@param alter_dropout_cases a numeric proportion between 0 and 1. The
+#'  proportion by which you would like to simulate decreasing the amount of
+#'  dropout between case control groups. For example, if you would like to
+#'  simulate a decrease in the amount of dropout in your cases by twenty
+#'  percent, then 0.2 would be appropriate. This component of the simulation
+#'  allows the user to adjust the proportion of dropout if they believe the
+#'  stochastic expression of a gene will differ between cases and controls. For
+#'  a two-part hurdle model, like MAST implements, this will increase your
+#'  ability to detect differences. Defaults to 0.
+#'
 #'@return The estimated power under the specified conditions when using random
 #'  effects to account for the correlation structure that exists among measures
 #'  from cells within an individual.
@@ -121,7 +131,8 @@ power_hierarchicell <- function(data_summaries,
                                    cells_per_individual = 100,
                                    pval = 0.05,
                                    foldchange = 1,
-                                   decrease_dropout = 0){
+                                   decrease_dropout = 0,
+                                   alter_dropout_cases = 0){
 
 
 
@@ -153,7 +164,8 @@ power_hierarchicell <- function(data_summaries,
                                                          n_controls = n_controls,
                                                          cells_per_individual = cells_per_individual,
                                                          foldchange = foldchange,
-                                                         decrease_dropout = decrease_dropout))
+                                                         decrease_dropout = decrease_dropout,
+                                                         alter_dropout_cases = alter_dropout_cases))
 
     genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
     coldata <- all_genes[,1:3]

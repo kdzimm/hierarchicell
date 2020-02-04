@@ -89,6 +89,16 @@ NULL
 #'  cause the mean expression in cases to be either twice the amount or half the
 #'  amount for any particular gene. Defaults to 1.
 #'
+#'@param alter_dropout_cases a numeric proportion between 0 and 1. The
+#'  proportion by which you would like to simulate decreasing the amount of
+#'  dropout between case control groups. For example, if you would like to
+#'  simulate a decrease in the amount of dropout in your cases by twenty
+#'  percent, then 0.2 would be appropriate. This component of the simulation
+#'  allows the user to adjust the proportion of dropout if they believe the
+#'  stochastic expression of a gene will differ between cases and controls. For
+#'  a two-part hurdle model, like MAST implements, this will increase your
+#'  ability to detect differences. Defaults to 0.
+#'
 #'@param decrease_dropout a numeric proportion between 0 and 1. The proportion
 #'  by which you would like to simulate decreasing the amount of dropout in your
 #'  data. For example, if you would like to simulate a decrease in the amount of
@@ -106,8 +116,8 @@ NULL
 #'  name of the pdf file where the tSNE plot will be stored. Defaults to
 #'  "tSNE_Simulated_Data".
 #'
-#'@return A data.frame of the simulated data or potentially a pdf of a tSNE
-#'  plot (if tSNE_plot=TRUE).
+#'@return A data.frame of the simulated data or potentially a pdf of a tSNE plot
+#'  (if tSNE_plot=TRUE).
 #'
 #'@examples
 #'clean_expr_data <- filter_counts()
@@ -124,6 +134,7 @@ simulate_hierarchicell <- function(data_summaries,
                                    cells_per_individual = 150,
                                    foldchange = 1,
                                    decrease_dropout = 0,
+                                   alter_dropout_cases = 0,
                                    tSNE_plot = FALSE,
                                    plot_name="tSNE_Simulated_Data"){
 
@@ -202,7 +213,7 @@ simulate_hierarchicell <- function(data_summaries,
 
       for (i in 1:n_cases){
         prob_zero_cell_case[[i]] <- stats::rnorm(n=ncells_per_case[i],
-                                          mean=(cell_dropout_mean*(1-decrease_dropout)),
+                                          mean=(cell_dropout_mean*(1-decrease_dropout)*(1-alter_dropout_cases)),
                                           sd=cell_dropout_sd)
         prob_zero_cell_case[[i]] <- ifelse(prob_zero_cell_case[[i]] < 0,
                                            0, prob_zero_cell_case[[i]])
@@ -377,7 +388,7 @@ simulate_hierarchicell <- function(data_summaries,
 
     for (i in 1:n_cases){
       prob_zero_cell_case[[i]] <- stats::rnorm(n=ncells_per_case[i],
-                                        mean=(cell_dropout_mean*(1-decrease_dropout)),
+                                        mean=(cell_dropout_mean*(1-decrease_dropout)*(1-alter_dropout_cases)),
                                         sd=cell_dropout_sd)
       prob_zero_cell_case[[i]] <- ifelse(prob_zero_cell_case[[i]] < 0,
                                          0, prob_zero_cell_case[[i]])

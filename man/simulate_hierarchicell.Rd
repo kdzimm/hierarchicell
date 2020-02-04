@@ -13,6 +13,7 @@ simulate_hierarchicell(
   cells_per_individual = 150,
   foldchange = 1,
   decrease_dropout = 0,
+  alter_dropout_cases = 0,
   tSNE_plot = FALSE,
   plot_name = "tSNE_Simulated_Data"
 )
@@ -57,6 +58,16 @@ dropout if they believe future experiments or runs will have improved
 calling rates (due to improved methods or improved cell viability) and
 thereby lower dropout rates. Defaults to 0.}
 
+\item{alter_dropout_cases}{a numeric proportion between 0 and 1. The
+proportion by which you would like to simulate decreasing the amount of
+dropout between case control groups. For example, if you would like to
+simulate a decrease in the amount of dropout in your cases by twenty
+percent, then 0.2 would be appropriate. This component of the simulation
+allows the user to adjust the proportion of dropout if they believe the
+stochastic expression of a gene will differ between cases and controls. For
+a two-part hurdle model, like MAST implements, this will increase your
+ability to detect differences. Defaults to 0.}
+
 \item{tSNE_plot}{a TRUE/FALSE statement for the output of a tSNE plot to
 observe the global behavior of your simulated data. Seurat will need to be
 installed for this function to properly work. Defaults to FALSE.}
@@ -66,8 +77,8 @@ name of the pdf file where the tSNE plot will be stored. Defaults to
 "tSNE_Simulated_Data".}
 }
 \value{
-A data.frame of the simulated data or potentially a pdf of a tSNE
- plot (if tSNE_plot=TRUE).
+A data.frame of the simulated data or potentially a pdf of a tSNE plot
+ (if tSNE_plot=TRUE).
 }
 \description{
 This function will compute a  simulation that will borrow

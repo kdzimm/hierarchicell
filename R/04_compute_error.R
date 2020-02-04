@@ -100,6 +100,16 @@ NULL
 #'@param pval a number. The significance threshold (alpha) to use for
 #'  significance. Defaults to 0.05.
 #'
+#'@param alter_dropout_cases a numeric proportion between 0 and 1. The
+#'  proportion by which you would like to simulate decreasing the amount of
+#'  dropout between case control groups. For example, if you would like to
+#'  simulate a decrease in the amount of dropout in your cases by twenty
+#'  percent, then 0.2 would be appropriate. This component of the simulation
+#'  allows the user to adjust the proportion of dropout if they believe the
+#'  stochastic expression of a gene will differ between cases and controls. For
+#'  a two-part hurdle model, like MAST implements, this will increase your
+#'  ability to detect differences. Defaults to 0.
+#'
 #'@param decrease_dropout a numeric proportion between 0 and 1. The proportion
 #'  by which you would like to simulate decreasing the amount of dropout in your
 #'  data. For example, if you would like to simulate a decrease in the amount of
@@ -129,7 +139,8 @@ error_hierarchicell <- function(data_summaries,
                                    cells_per_individual = 100,
                                    pval = 0.05,
                                    foldchange = 1,
-                                   decrease_dropout = 0){
+                                   decrease_dropout = 0,
+                                   alter_dropout_cases = 0){
   if (method == "MAST_RE") {
 
 
@@ -166,7 +177,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
@@ -238,7 +250,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
@@ -310,7 +323,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
@@ -386,7 +400,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
@@ -447,7 +462,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
@@ -508,7 +524,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
@@ -570,7 +587,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
@@ -627,7 +645,8 @@ error_hierarchicell <- function(data_summaries,
                                                            n_controls = n_controls,
                                                            cells_per_individual = cells_per_individual,
                                                            foldchange = foldchange,
-                                                           decrease_dropout = decrease_dropout))
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
 
       genecounts <- as.matrix(t(all_genes[,c(-1,-2,-3)]))
       coldata <- all_genes[,1:3]
