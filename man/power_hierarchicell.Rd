@@ -44,7 +44,8 @@ an integer less than 300, but more is possible. We note that anything
 greater than 100, brings marginal improvements in power. Defaults to 100.}
 
 \item{pval}{a number. The significance threshold (alpha) to use for
-significance. Defaults to 0.05.}
+significance. Defaults to 0.05. Can also be a vector of pvalue - up to a
+length of 5.}
 
 \item{foldchange}{an integer between 1 and 10. The amount of fold change to
 simulate a difference in expression between case and control groups. The

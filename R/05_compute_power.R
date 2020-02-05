@@ -85,7 +85,8 @@ NULL
 #'  greater than 100, brings marginal improvements in power. Defaults to 100.
 #'
 #'@param pval a number. The significance threshold (alpha) to use for
-#'  significance. Defaults to 0.05.
+#'  significance. Defaults to 0.05. Can also be a vector of pvalue - up to a
+#'  length of 5.
 #'
 #'@param foldchange an integer between 1 and 10. The amount of fold change to
 #'  simulate a difference in expression between case and control groups. The
@@ -191,13 +192,87 @@ power_hierarchicell <- function(data_summaries,
     summaryCond <- suppressMessages(MAST::summary(zlmCond,
                                                   doLRT='StatusControl'))
     summaryDt <- summaryCond$datatable
-    print(head(summaryDt))
     fcHurdle <-  summaryDt[summaryDt$contrast=='StatusControl' & summaryDt$component=='H', c(1,4)]
 
     fcHurdle <- stats::na.omit(as.data.frame(fcHurdle))
-    signif <- ifelse(fcHurdle[,2] < pval, 1, 0)
-    rate <- mean(signif)
-    message(paste0("Power is: ", rate))
+
+    if (length(pval) == 1){
+
+      signif <- ifelse(fcHurdle[,2] < pval, 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval," is: ", rate))
+
+    } else if (length(pval) == 2) {
+
+      signif <- ifelse(fcHurdle[,2] < pval[1], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[1]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[2], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[2]," is: ", rate))
+
+    } else if (length(pval) == 3) {
+
+      signif <- ifelse(fcHurdle[,2] < pval[1], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[1]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[2], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[2]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[3], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[3]," is: ", rate))
+
+
+    } else if (length(pval) == 4) {
+
+      signif <- ifelse(fcHurdle[,2] < pval[1], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[1]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[2], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[2]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[3], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[3]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[4], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[4]," is: ", rate))
+
+    } else if (length(pval) == 5) {
+
+      signif <- ifelse(fcHurdle[,2] < pval[1], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[1]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[2], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[2]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[3], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[3]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[4], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[4]," is: ", rate))
+
+      signif <- ifelse(fcHurdle[,2] < pval[5], 1, 0)
+      rate <- mean(signif)
+      message(paste0("Power for ",pval[5]," is: ", rate))
+
+    } else {
+
+      message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+    }
+
 
   }
 

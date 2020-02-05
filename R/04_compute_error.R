@@ -98,7 +98,8 @@ NULL
 #'  100.
 #'
 #'@param pval a number. The significance threshold (alpha) to use for
-#'  significance. Defaults to 0.05.
+#'  significance. Defaults to 0.05. Can also be a vector of pvalue - up to a
+#'  length of 5.
 #'
 #'@param alter_dropout_cases a numeric proportion between 0 and 1. The
 #'  proportion by which you would like to simulate decreasing the amount of
@@ -211,11 +212,86 @@ error_hierarchicell <- function(data_summaries,
                         by = 'primerid')
 
       fcHurdle <- stats::na.omit(as.data.frame(fcHurdle))
-      signif <- ifelse(fcHurdle[,6] < pval, 1, 0)
-      rate <- mean(signif)
-      message(paste0("Type 1 error rate is: ", rate))
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(fcHurdle[,6] < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
 
     }
+
   } else if (method == "MAST") {
     if (!requireNamespace(c("MAST","SummarizedExperiment"),quietly = TRUE)){
       stop("The packages 'MAST', 'fitdistrplus', and \n
@@ -283,9 +359,83 @@ error_hierarchicell <- function(data_summaries,
                         by = 'primerid')
 
       fcHurdle <- stats::na.omit(as.data.frame(fcHurdle))
-      signif <- ifelse(fcHurdle[,6] < pval, 1, 0)
-      rate <- mean(signif)
-      message(paste0("Type 1 error rate is: ", rate))
+      if (length(pval) == 1){
+
+        signif <- ifelse(fcHurdle[,6] < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
+
     }
 
 
@@ -357,12 +507,85 @@ error_hierarchicell <- function(data_summaries,
                         by = 'primerid')
 
       fcHurdle <- stats::na.omit(as.data.frame(fcHurdle))
-      signif <- ifelse(fcHurdle[,6] < pval, 1, 0)
-      rate <- mean(signif)
-      message(paste0("Type 1 error rate is: ", rate))
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(fcHurdle[,6] < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(fcHurdle[,6] < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(fcHurdle[,6] < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
 
       }
 
+    }
 
 
   } else if (method == "GLM_tweedie") {
@@ -420,9 +643,84 @@ error_hierarchicell <- function(data_summaries,
                                                       ziformula= ~0)})
       summaries <- lapply(fitfixed, summary)
       pvalues <- as.numeric(unlist(lapply(summaries, function(x){stats::coef(x)$cond[2,4]})))
-      signif <- ifelse(pvalues < pval, 1, 0)
-      rate <- mean(signif)
-      message(paste0("Type 1 error rate is: ", rate))
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(pvalues < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
+
 
     }
 
@@ -482,9 +780,83 @@ error_hierarchicell <- function(data_summaries,
                                                       ziformula= ~0)})
       summaries <- lapply(fitmixed, summary)
       pvalues <- as.numeric(unlist(lapply(summaries, function(x){stats::coef(x)$cond[2,4]})))
-      signif <- ifelse(pvalues < pval, 1, 0)
-      rate <- mean(signif)
-      message(paste0("Type 1 error rate is: ", rate))
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(pvalues < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
 
     }
 
@@ -545,10 +917,83 @@ error_hierarchicell <- function(data_summaries,
                                                      corstr="exchangeable")})
       summaries <- lapply(fitgee, summary)
       pvalues <- as.numeric(unlist(lapply(summaries, function(x){stats::coef(x)[2,4]})))
-      signif <- ifelse(pvalues < pval, 1, 0)
-      rate <- mean(signif)
-      message(paste0("Type 1 error rate is: ", rate))
 
+      if (length(pval) == 1){
+
+        signif <- ifelse(pvalues < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
 
 
     }
@@ -603,10 +1048,84 @@ error_hierarchicell <- function(data_summaries,
       results <- as.data.frame(results)
       results <- stats::na.omit(results)
 
-      nsig <- length(results$pvalue[results$pvalue<=pval])
-      n.non.singular <- length(results$pvalue)
-      rate <- nsig/n.non.singular
-      message(paste0("Type 1 error rate is: ", rate))
+      pvalues <- as.numeric(results$pvalue)
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(pvalues < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
 
       }
 
@@ -669,10 +1188,84 @@ error_hierarchicell <- function(data_summaries,
       results <- monocle::differentialGeneTest(celldat, fullModelFormulaStr = "~Status")
       results <- stats::na.omit(results)
 
-      nsig <- length(results$pval[results$pval<=pval])
-      n.non.singular <- length(results$pval)
-      rate <- nsig/n.non.singular
-      message(paste0("Type 1 error rate is: ", rate))
+      pvalues <- as.numeric(results$pvalue)
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(pvalues < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
 
       }
 
