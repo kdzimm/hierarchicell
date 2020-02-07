@@ -40,4 +40,5 @@ Imports:
     monocle,
     stats,
     methods,
-    grDevices
+    grDevices,
+    growthcurver

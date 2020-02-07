@@ -170,10 +170,14 @@ simulate_hierarchicell <- function(data_summaries,
               " and rate: ",
               round(gene_mean_rate,2))
 
-      gene_dropout_beta1 <- model_gene_drop(data_summaries)[2]
+      gene_dropout_r <- model_gene_drop(data_summaries)[1]
+      gene_dropout_k <- model_gene_drop(data_summaries)[3]
+      gene_dropout_n0 <- model_gene_drop(data_summaries)[2]
       message("-------------------------------------------------------")
-      message("Function for gene-wise dropout is:\nDropout = 1 + (",
-              round(gene_dropout_beta1,2),")(GrandMean)")
+      message("Function for gene-wise dropout is:\nDropout = 1 - (",
+              round(gene_dropout_k,2),"*",round(gene_dropout_n0,2)," / ",
+              round(gene_dropout_n0,2)," + (", round(gene_dropout_k,2)," - ",
+              round(gene_dropout_n0,2),")e^",-round(gene_dropout_r,2),"*GrandMean)")
 
       inter_beta1 <- model_inter(data_summaries)[1]
       inter_beta2 <- model_inter(data_summaries)[2]
@@ -236,8 +240,10 @@ simulate_hierarchicell <- function(data_summaries,
 
         for (i in 1:n_controls){
 
-          prob_zero_gene <- 1 + (gene_dropout_beta1*grandmean)
-          prob_zero_gene <- ifelse(prob_zero_gene < 0, 0, prob_zero_gene)
+          prob_zero_gene <- 1 - ((gene_dropout_n0*gene_dropout_k)/
+                                   (gene_dropout_n0 +
+                                      ((gene_dropout_k - gene_dropout_n0)*exp(-gene_dropout_r*grandmean))))
+
 
           controlmean <- grandmean + stats::rnorm(n=1,mean=0,sd=stddev_of_within_means)
           controlcells <- stats::rnorm(n=ncells_per_control[i],mean=controlmean,sd=within_donor_stddev)
@@ -249,8 +255,10 @@ simulate_hierarchicell <- function(data_summaries,
 
         for (i in 1:n_cases){
 
-          prob_zero_gene <- 1 + (gene_dropout_beta1*grandmean)
-          prob_zero_gene <- ifelse(prob_zero_gene < 0, 0, prob_zero_gene)
+          prob_zero_gene <- 1 - ((gene_dropout_n0*gene_dropout_k)/
+                                   (gene_dropout_n0 +
+                                      ((gene_dropout_k - gene_dropout_n0)*exp(-gene_dropout_r*grandmean))))
+
 
           fc <- ifelse(stats::rbinom(n=1, size=1, prob = 0.5) == 1, foldchange, 1/foldchange)
           casemean <- (grandmean*fc) + stats::rnorm(n=1,mean=0,sd=stddev_of_within_means)
@@ -345,10 +353,14 @@ simulate_hierarchicell <- function(data_summaries,
             " and rate: ",
             round(gene_mean_rate,2))
 
-    gene_dropout_beta1 <- model_gene_drop(data_summaries)[2]
+    gene_dropout_r <- model_gene_drop(data_summaries)[1]
+    gene_dropout_k <- model_gene_drop(data_summaries)[3]
+    gene_dropout_n0 <- model_gene_drop(data_summaries)[2]
     message("-------------------------------------------------------")
-    message("Function for gene-wise dropout is:\nDropout = 1 + (",
-            round(gene_dropout_beta1,2),")(GrandMean)")
+    message("Function for gene-wise dropout is:\nDropout = 1 - (",
+            round(gene_dropout_k,2),"*",round(gene_dropout_n0,2)," / ",
+            round(gene_dropout_n0,2)," + (", round(gene_dropout_k,2)," - ",
+            round(gene_dropout_n0,2),")e^",-round(gene_dropout_r,2),"*GrandMean)")
 
     inter_beta1 <- model_inter(data_summaries)[1]
     inter_beta2 <- model_inter(data_summaries)[2]
@@ -411,8 +423,9 @@ simulate_hierarchicell <- function(data_summaries,
 
       for (i in 1:n_controls){
 
-        prob_zero_gene <- 1 + (gene_dropout_beta1*grandmean)
-        prob_zero_gene <- ifelse(prob_zero_gene < 0, 0, prob_zero_gene)
+        prob_zero_gene <- 1 - ((gene_dropout_n0*gene_dropout_k)/
+                                 (gene_dropout_n0 +
+                                    ((gene_dropout_k - gene_dropout_n0)*exp(-gene_dropout_r*grandmean))))
 
         controlmean <- grandmean + stats::rnorm(n=1,mean=0,sd=stddev_of_within_means)
         controlcells <- stats::rnorm(n=ncells_per_control[i],mean=controlmean,sd=within_donor_stddev)
@@ -424,8 +437,9 @@ simulate_hierarchicell <- function(data_summaries,
 
       for (i in 1:n_cases){
 
-        prob_zero_gene <- 1 + (gene_dropout_beta1*grandmean)
-        prob_zero_gene <- ifelse(prob_zero_gene < 0, 0, prob_zero_gene)
+        prob_zero_gene <- 1 - ((gene_dropout_n0*gene_dropout_k)/
+                                 (gene_dropout_n0 +
+                                    ((gene_dropout_k - gene_dropout_n0)*exp(-gene_dropout_r*grandmean))))
 
         casemean <- (grandmean*foldchange) + stats::rnorm(n=1,mean=0,sd=stddev_of_within_means)
         casecells <- stats::rnorm(n=ncells_per_case[i],mean=casemean,sd=within_donor_stddev)

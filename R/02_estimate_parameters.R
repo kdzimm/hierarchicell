@@ -227,7 +227,7 @@ approximate_gene_mean <- function(data_summaries){
 #'
 #'@rdname model_gene_drop
 #'
-#'@description This function models gene dropout as a linear function of the
+#'@description This function models gene dropout as a logit function of the
 #'  grand mean. Visualizing this fit and looking for oddities and extreme
 #'  outliers may be helpful.
 #'
@@ -241,12 +241,13 @@ approximate_gene_mean <- function(data_summaries){
 #'  compute_data_summaries function.
 #'
 #'@param plot a TRUE/FALSE statement for the output of a plot to observe how
-#'  well gene dropout behaves as a linear function of the grand mean
+#'  well gene dropout behaves as a logit function of the grand mean
 #'
-#'@return A plot (if plot=TRUE) and a vector of length two, where the first
-#'  number is the estimate of the intercept (beta0) and the second number is the
-#'  estimate of the slope (beta1). The estimate of the intercept should be very
-#'  close to one.
+#'@return A plot (if plot=TRUE) and a vector of length three, where the first
+#'  number is the estimate of the r value (growth rate) and the second and third
+#'  numbers are the estimate of the initial size and carrying capacity,
+#'  respectively. The estimate of the carrying capacity should be close to one
+#'  and the initial size close to zero.
 #'
 #'@examples
 #'data_summaries <- compute_data_summaries(clean_expr_data)
@@ -263,31 +264,35 @@ model_gene_drop <- function(data_summaries, plot=FALSE){
     n_individuals <- data_summaries[[3]]
     data_summaries <- data_summaries[[4]]
     data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
-
+    data_summaries$DropOut <- 1 - data_summaries$DropOut
     message("Plotting gene-wise dropout")
+
+    gc_fit <- growthcurver::SummarizeGrowth(data_summaries$GrandMean, data_summaries$DropOut)
+    data_summaries$Predicted_Curve <- stats::predict(gc_fit$model)
 
     ggplot2::ggplot(data_summaries,ggplot2::aes(x=GrandMean,y=DropOut),
                       environment = environment()) +
       ggplot2::geom_point() +
-      ggplot2::stat_smooth(method="lm",formula = y ~ x , size = 1) +
+      ggplot2::geom_line(data=data_summaries, ggplot2::aes(y=data_summaries$Predicted_Curve), size = 1, color = "red") +
       ggplot2::ylim(c(0,1))
       ggplot2::ggsave("Gene_Dropout.pdf")
 
-    temp <- stats::lm(data = data_summaries, DropOut ~ GrandMean)
-    temp <- summary(temp)
-    dropout.beta0 <- temp$coefficients[1,1]
-    dropout.beta1 <- temp$coefficients[2,1]
-    as.numeric(c(dropout.beta0,dropout.beta1))
+    dropout.r <- gc_fit$vals$r
+    dropout.N_0 <- gc_fit$vals$n0
+    dropout.K <- gc_fit$vals$k
+    as.numeric(c(dropout.r,dropout.N_0,dropout.K))
     }
   } else {
     n_individuals <- data_summaries[[3]]
     data_summaries <- data_summaries[[4]]
     data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
-    temp <- stats::lm(data = data_summaries, DropOut ~ GrandMean)
-    temp <- summary(temp)
-    dropout.beta0 <- temp$coefficients[1,1]
-    dropout.beta1 <- temp$coefficients[2,1]
-    as.numeric(c(dropout.beta0,dropout.beta1))
+    data_summaries$DropOut <- 1 - data_summaries$DropOut
+    gc_fit <- growthcurver::SummarizeGrowth(data_summaries$GrandMean, data_summaries$DropOut)
+    data_summaries$Predicted_Curve <- stats::predict(gc_fit$model)
+    dropout.r <- gc_fit$vals$r
+    dropout.N_0 <- gc_fit$vals$n0
+    dropout.K <- gc_fit$vals$k
+    as.numeric(c(dropout.r,dropout.N_0,dropout.K))
   }
 }
 

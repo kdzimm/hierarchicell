@@ -11,16 +11,17 @@ model_gene_drop(data_summaries, plot = FALSE)
 compute_data_summaries function.}
 
 \item{plot}{a TRUE/FALSE statement for the output of a plot to observe how
-well gene dropout behaves as a linear function of the grand mean}
+well gene dropout behaves as a logit function of the grand mean}
 }
 \value{
-A plot (if plot=TRUE) and a vector of length two, where the first
- number is the estimate of the intercept (beta0) and the second number is the
- estimate of the slope (beta1). The estimate of the intercept should be very
- close to one.
+A plot (if plot=TRUE) and a vector of length three, where the first
+ number is the estimate of the r value (growth rate) and the second and third
+ numbers are the estimate of the initial size and carrying capacity,
+ respectively. The estimate of the carrying capacity should be close to one
+ and the initial size close to zero.
 }
 \description{
-This function models gene dropout as a linear function of the
+This function models gene dropout as a logit function of the
  grand mean. Visualizing this fit and looking for oddities and extreme
  outliers may be helpful.
 }
