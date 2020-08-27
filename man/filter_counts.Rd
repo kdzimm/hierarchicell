@@ -4,11 +4,7 @@
 \alias{filter_counts}
 \title{Filter gene expression matrix}
 \usage{
-filter_counts(
-  expr = hierarchicell:::mucosal_cells,
-  gene_thresh = 0,
-  cell_thresh = 5
-)
+filter_counts(expr = alpha_cells, gene_thresh = 0, cell_thresh = 0)
 }
 \arguments{
 \item{expr}{a data.frame where the unique cell identifier is in column one
@@ -19,10 +15,10 @@ being genes.}
 Defaults to 0.}
 
 \item{cell_thresh}{the mean expression threshold for retaining cells.
-Defaults to 5.}
+Defaults to 0.}
 }
 \value{
-a data.frame that has filtered out cells with mean count < 5 and
+a data.frame that has filtered out cells with mean count = 0 and
   genes with mean count = 0
 }
 \description{
@@ -30,7 +26,7 @@ This function loads and filters the input data for the
   subsequent steps. The data loading and cleaning function is very basic, but
   data input is critical to the package working correctly. If no input data
   is given, the package defaults to using normal mucosal cells data for the
-  simulation and power calculations (see \code{\link{mucosal_cells}}).
+  simulation and power calculations (see \code{\link{alpha_cells}}).
 }
 \details{
 Input data should be formatted as follows:

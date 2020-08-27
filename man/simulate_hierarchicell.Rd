@@ -6,11 +6,13 @@
 \usage{
 simulate_hierarchicell(
   data_summaries,
-  n_genes = 15000,
+  n_genes = 1000,
   n_per_group = 3,
   n_cases = n_per_group,
   n_controls = n_per_group,
-  cells_per_individual = 150,
+  cells_per_control = 150,
+  cells_per_case = 150,
+  ncells_variation_type = "Poisson",
   foldchange = 1,
   decrease_dropout = 0,
   alter_dropout_cases = 0,
@@ -25,12 +27,13 @@ compute_data_summaries function. No default}
 \item{n_genes}{an integer. The number of genes you would like to simulate for
 your dataset. Too large of a number may cause memory failure and may slow
 the simulation down tremendously. We recommend an integer less than 100,000.
-Defaults to 15,000.}
+Defaults to 1,000.}
 
 \item{n_per_group}{an integer. The number of independent samples per
-case/control group for simulation. Creates a balanced design, for unbalanced
-designs, specify n_cases and n_controls separately. If not specifying a
-foldchange, the number of cases and controls does not matter. Defaults to 3.}
+case/control group for simulation. Use when "binary" is specified as the
+outcome. Creates a balanced design, for unbalanced designs, specify n_cases
+and n_controls separately. If not specifying a foldchange, the number of
+cases and controls does not matter. Defaults to 3.}
 
 \item{n_cases}{an integer. The number of independent control samples for
 simulation. Defaults to n_per_group.}
@@ -38,10 +41,22 @@ simulation. Defaults to n_per_group.}
 \item{n_controls}{an integer. The number of independent case samples for
 simulation. Defaults to n_per_group.}
 
-\item{cells_per_individual}{an integer. The mean number of cells per
-individual you would like to simulate. Too large of a number may cause
-memory failure and may slow the simulation down tremendously. We recommend
-an integer less than 1,000.Defaults to 150.}
+\item{cells_per_control}{an integer. The mean number of cells per control you
+would like to simulate. Too large of a number may cause memory failure and
+may slow the simulation down tremendously. We recommend an integer less than
+1,000.Defaults to 150.}
+
+\item{cells_per_case}{an integer. The mean number of cells per case you would
+like to simulate. Too large of a number may cause memory failure and may
+slow the simulation down tremendously. We recommend an integer less than
+1,000.Defaults to 150.}
+
+\item{ncells_variation_type}{either "Poisson", "NB", or "Fixed". Allows the
+number of cells per individual to be fixed at exactly the specified number
+of cells per individual, vary slightly with a poisson distribution with a
+lambda equal to the specified number of cells per individual, or a negative
+binomial with a mean equal to the specified number of cells and dispersion
+size equal to one.Defaults to "Poisson".}
 
 \item{foldchange}{an integer between 1 and 10. The amount of fold change to
 simulate a difference in expression between case and control groups. The

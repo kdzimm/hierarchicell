@@ -15,9 +15,9 @@ The simulation of single cell data that is cell-type specifc,
 \details{
 Prior to running the \code{\link{simulate_hierarchicell}} function,
   it is important to run the \code{\link{filter_counts}} function followed by
-  the \code{\link{compute_data_summaries}} function to build an R object
-  that is in the right format for the following simulation function to
-  properly work.
+  the \code{\link{compute_data_summaries}} function to build an R object that
+  is in the right format for the following simulation function to properly
+  work.
 }
 \note{
 Data should be \strong{only for cells of the specific cell-type} you

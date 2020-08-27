@@ -10,7 +10,9 @@ power_hierarchicell(
   n_per_group = 3,
   n_cases = n_per_group,
   n_controls = n_per_group,
-  cells_per_individual = 100,
+  cells_per_case = 100,
+  cells_per_control = 100,
+  ncells_variation_type = "Poisson",
   pval = 0.05,
   foldchange = 1,
   decrease_dropout = 0,
@@ -37,17 +39,30 @@ simulation. Defaults to n_per_group.}
 \item{n_controls}{an integer. The number of independent case samples for
 simulation. Defaults to n_per_group.}
 
-\item{cells_per_individual}{an integer. The mean number of cells per
-individual you would like to simulate. Too large of a number may cause
-memory failure and may slow the simulation down tremendously. We recommend
-an integer less than 300, but more is possible. We note that anything
-greater than 100, brings marginal improvements in power. Defaults to 100.}
+\item{cells_per_case}{an integer. The mean number of cells per case you would
+like to simulate. Too large of a number may cause memory failure and may
+slow the simulation down tremendously. We recommend an integer less than
+300, but more is possible. We note that anything greater than 100, brings
+marginal improvements in power. Defaults to 100.}
+
+\item{cells_per_control}{an integer. The mean number of cells per control you
+would like to simulate. Too large of a number may cause memory failure and
+may slow the simulation down tremendously. We recommend an integer less than
+300, but more is possible. We note that anything greater than 100, brings
+marginal improvements in power. Defaults to 100.}
+
+\item{ncells_variation_type}{either "Poisson", "NB", or "Fixed". Allows the
+number of cells per individual to be fixed at exactly the specified number
+of cells per individual, vary slightly with a poisson distribution with a
+lambda equal to the specified number of cells per individual, or a negative
+binomial with a mean equal to the specified number of cells and dispersion
+size equal to one.Defaults to "Poisson".}
 
 \item{pval}{a number. The significance threshold (alpha) to use for
 significance. Defaults to 0.05. Can also be a vector of pvalue - up to a
 length of 5.}
 
-\item{foldchange}{an integer between 1 and 10. The amount of fold change to
+\item{foldchange}{a number between 1 and 10. The amount of fold change to
 simulate a difference in expression between case and control groups. The
 foldchange changes genes in either direction, so a foldchange of 2  would
 cause the mean expression in cases to be either twice the amount or half the
@@ -107,6 +122,6 @@ Data should be \strong{only for cells of the specific cell-type} you are
 \examples{
 clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
-power_hierarchicell(data_summaries)
+power_hierarchicell(data_summaries, n_genes = 100, n_per_group = 2)
 
 }

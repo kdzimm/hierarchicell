@@ -2,8 +2,8 @@
 % Please edit documentation in R/02_estimate_parameters.R
 \name{model_inter}
 \alias{model_inter}
-\title{Model Inter-Individual Heterogeneity as a Quadratic Function of the
- Grand Mean}
+\title{Model Inter-Individual Heterogeneity as a Linear Function of the Grand
+ Mean}
 \usage{
 model_inter(data_summaries, plot = FALSE)
 }
@@ -12,18 +12,18 @@ model_inter(data_summaries, plot = FALSE)
 compute_data_summaries function.}
 
 \item{plot}{a TRUE/FALSE statement for the output of a plot to observe how
-well inter-individual standard deviation behaves as a quadratic function of
-the grand mean}
+well inter-individual standard deviation behaves as a linear function of the
+grand mean}
 }
 \value{
-A plot (if plot=TRUE) and a vector of length two, where the first
- number is the estimate of beta1 and the second number is the estimate of
- beta2 (function is forced through the origin, so intercept is zero).
+A plot (if plot=TRUE) a vector of length two, where the first
+ number is the estimate of the intercept for the log model second number is
+ the estimate of the slope for the log model.
 }
 \description{
-This function models inter-individual heterogeneity as a
- quadratic function of the grand mean. Visualizing this fit and looking for
- oddities and extreme outliers may be helpful.
+This function models inter-individual heterogeneity as a log
+ function of the grand mean. Visualizing this fit and looking for oddities
+ and extreme outliers may be helpful.
 }
 \details{
 Prior to estimating the simulation parameters, it is important to run
@@ -33,6 +33,7 @@ Prior to estimating the simulation parameters, it is important to run
  work. Please install it.
 }
 \examples{
+clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
 inter_betas <- model_inter(data_summaries)
 

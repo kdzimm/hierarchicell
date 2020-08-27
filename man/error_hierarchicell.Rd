@@ -11,7 +11,9 @@ error_hierarchicell(
   n_per_group = 3,
   n_cases = n_per_group,
   n_controls = n_per_group,
-  cells_per_individual = 100,
+  cells_per_case = 100,
+  cells_per_control = 100,
+  ncells_variation_type = "Poisson",
   pval = 0.05,
   foldchange = 1,
   decrease_dropout = 0,
@@ -27,10 +29,10 @@ the computation of error. Possible methods include: MAST with random effects
 ("MAST_RE"), MAST ("MAST"), MAST with batch effect correction
 ("MAST_Combat"), GLM assuming a tweedie distribution ("GLM_tweedie"), GLMM
 assuming a tweedie distribution ("GLMM_tweedie"), generalized estimating
-equations ("GEE1"), ROTS ("ROTS"), Monocle ("Monocle"), DESeq2 ("DESeq2").
-Defaults to "MAST_RE" which is the currently recommended analysis pipeline
-for single-cell data. See \code{\link{de_methods}} for more details on each
-of the methods.}
+equations ("GEE1"), ROTS ("ROTS"), or Monocle ("Monocle"). Defaults to
+"MAST_RE" which is the currently recommended analysis pipeline for
+single-cell data. See \code{\link{de_methods}} for more details on each of
+the methods.}
 
 \item{n_genes}{an integer. The number of genes you would like to simulate for
 your dataset. Too large of a number may cause memory failure and may slow
@@ -48,16 +50,36 @@ simulation. Defaults to n_per_group.}
 \item{n_controls}{an integer. The number of independent case samples for
 simulation. Defaults to n_per_group.}
 
-\item{cells_per_individual}{an integer. The mean number of cells per
-individual you would like to simulate. Too large of a number may cause
+\item{cells_per_case}{an integer. The mean number of cells per
+case you would like to simulate. Too large of a number may cause
 memory failure and may slow the simulation down tremendously. We recommend
 an integer less than 300, but more is possible. We note that anything
 greater than 100, brings marginal improvements in type 1 error. Defaults to
 100.}
 
+\item{cells_per_control}{an integer. The mean number of cells per
+control you would like to simulate. Too large of a number may cause
+memory failure and may slow the simulation down tremendously. We recommend
+an integer less than 300, but more is possible. We note that anything
+greater than 100, brings marginal improvements in type 1 error. Defaults to
+100.}
+
+\item{ncells_variation_type}{either "Poisson", "NB", or "Fixed". Allows the
+number of cells per individual to be fixed at exactly the specified number
+of cells per individual, vary slightly with a poisson distribution with a
+lambda equal to the specified number of cells per individual, or a negative
+binomial with a mean equal to the specified number of cells and dispersion
+size equal to one.Defaults to "Poisson".}
+
 \item{pval}{a number. The significance threshold (alpha) to use for
 significance. Defaults to 0.05. Can also be a vector of pvalue - up to a
 length of 5.}
+
+\item{foldchange}{a number between 1 and 10. The amount of fold change to
+simulate a difference in expression between case and control groups. The
+foldchange changes genes in either direction, so a foldchange of 2  would
+cause the mean expression in cases to be either twice the amount or half the
+amount for any particular gene. Defaults to 1.}
 
 \item{decrease_dropout}{a numeric proportion between 0 and 1. The proportion
 by which you would like to simulate decreasing the amount of dropout in your
@@ -114,6 +136,10 @@ Data should be \strong{only for cells of the specific cell-type} you are
 \examples{
 clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
-error_hierarchicell(data_summaries)
+error_hierarchicell(data_summaries,
+                   n_genes = 100,
+                   n_per_group = 4,
+                   cells_per_case = 50,
+                   cells_per_control = 50)
 
 }

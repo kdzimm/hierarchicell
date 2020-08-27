@@ -27,6 +27,7 @@ Prior to estimating the simulation parameters, it is important to run
  it
 }
 \examples{
+clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
 gene_mean_params <- approximate_gene_mean(data_summaries)
 

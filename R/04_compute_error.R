@@ -69,10 +69,10 @@ NULL
 #'  ("MAST_RE"), MAST ("MAST"), MAST with batch effect correction
 #'  ("MAST_Combat"), GLM assuming a tweedie distribution ("GLM_tweedie"), GLMM
 #'  assuming a tweedie distribution ("GLMM_tweedie"), generalized estimating
-#'  equations ("GEE1"), ROTS ("ROTS"), Monocle ("Monocle"), DESeq2 ("DESeq2").
-#'  Defaults to "MAST_RE" which is the currently recommended analysis pipeline
-#'  for single-cell data. See \code{\link{de_methods}} for more details on each
-#'  of the methods.
+#'  equations ("GEE1"), ROTS ("ROTS"), or Monocle ("Monocle"). Defaults to
+#'  "MAST_RE" which is the currently recommended analysis pipeline for
+#'  single-cell data. See \code{\link{de_methods}} for more details on each of
+#'  the methods.
 #'
 #'@param n_genes an integer. The number of genes you would like to simulate for
 #'  your dataset. Too large of a number may cause memory failure and may slow
@@ -90,12 +90,28 @@ NULL
 #'@param n_controls an integer. The number of independent case samples for
 #'  simulation. Defaults to n_per_group.
 #'
-#'@param cells_per_individual an integer. The mean number of cells per
-#'  individual you would like to simulate. Too large of a number may cause
+#'@param cells_per_control an integer. The mean number of cells per
+#'  control you would like to simulate. Too large of a number may cause
 #'  memory failure and may slow the simulation down tremendously. We recommend
 #'  an integer less than 300, but more is possible. We note that anything
 #'  greater than 100, brings marginal improvements in type 1 error. Defaults to
 #'  100.
+#'
+#'@param cells_per_case an integer. The mean number of cells per
+#'  case you would like to simulate. Too large of a number may cause
+#'  memory failure and may slow the simulation down tremendously. We recommend
+#'  an integer less than 300, but more is possible. We note that anything
+#'  greater than 100, brings marginal improvements in type 1 error. Defaults to
+#'  100.
+#'
+#'
+#'@param ncells_variation_type either "Poisson", "NB", or "Fixed". Allows the
+#'  number of cells per individual to be fixed at exactly the specified number
+#'  of cells per individual, vary slightly with a poisson distribution with a
+#'  lambda equal to the specified number of cells per individual, or a negative
+#'  binomial with a mean equal to the specified number of cells and dispersion
+#'  size equal to one.Defaults to "Poisson".
+#'
 #'
 #'@param pval a number. The significance threshold (alpha) to use for
 #'  significance. Defaults to 0.05. Can also be a vector of pvalue - up to a
@@ -120,6 +136,12 @@ NULL
 #'  calling rates (due to improved methods or improved cell viability) and
 #'  thereby lower dropout rates. Defaults to 0.
 #'
+#'@param foldchange a number between 1 and 10. The amount of fold change to
+#'  simulate a difference in expression between case and control groups. The
+#'  foldchange changes genes in either direction, so a foldchange of 2  would
+#'  cause the mean expression in cases to be either twice the amount or half the
+#'  amount for any particular gene. Defaults to 1.
+#'
 #'@return The estimated error under the specified conditions when using 'MAST'
 #'  with random effects to account for the correlation structure that exists
 #'  among measures from cells within an individual.
@@ -127,7 +149,11 @@ NULL
 #'@examples
 #'clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'error_hierarchicell(data_summaries)
+#'error_hierarchicell(data_summaries,
+#'                    n_genes = 100,
+#'                    n_per_group = 4,
+#'                    cells_per_case = 50,
+#'                    cells_per_control = 50)
 #'
 #'@export
 
@@ -137,7 +163,9 @@ error_hierarchicell <- function(data_summaries,
                                    n_per_group = 3,
                                    n_cases = n_per_group,
                                    n_controls = n_per_group,
-                                   cells_per_individual = 100,
+                                   cells_per_case = 100,
+                                   cells_per_control = 100,
+                                   ncells_variation_type = "Poisson",
                                    pval = 0.05,
                                    foldchange = 1,
                                    decrease_dropout = 0,
@@ -159,13 +187,8 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
 
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -176,7 +199,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -307,13 +332,8 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
 
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -324,7 +344,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -454,13 +476,8 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
 
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -471,7 +488,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -604,13 +623,7 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
-
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -621,7 +634,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -630,9 +645,8 @@ error_hierarchicell <- function(data_summaries,
       coldata <- all_genes[,1:3]
       coldata$Status <- as.factor(coldata$Status)
       coldata$DonorID <- as.factor(coldata$DonorID)
-      genecounts <- genecounts[which(apply(genecounts, 1, mean) > 5), ]
-      genecounts <- log(sweep(genecounts,2,apply(genecounts,2,mean),'/'))
-      genecounts[which(genecounts == '-Inf')] <- 0
+      genecounts <- genecounts[which(apply(genecounts, 1, mean) > 5), ] + 1
+      genecounts <- log(genecounts)
       genecounts <- t(genecounts[,rownames(coldata)])
       allcells <- cbind(coldata,genecounts)
 
@@ -741,13 +755,8 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
 
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -758,7 +767,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -767,9 +778,8 @@ error_hierarchicell <- function(data_summaries,
       coldata <- all_genes[,1:3]
       coldata$Status <- as.factor(coldata$Status)
       coldata$DonorID <- as.factor(coldata$DonorID)
-      genecounts <- genecounts[which(apply(genecounts, 1, mean) > 5), ]
-      genecounts <- log(sweep(genecounts,2,apply(genecounts,2,mean),'/'))
-      genecounts[which(genecounts == '-Inf')] <- 0
+      genecounts <- genecounts[which(apply(genecounts, 1, mean) > 5), ] + 1
+      genecounts <- log(genecounts)
       genecounts <- t(genecounts[,rownames(coldata)])
       allcells <- cbind(coldata,genecounts)
 
@@ -877,13 +887,8 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
 
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -894,7 +899,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -903,9 +910,8 @@ error_hierarchicell <- function(data_summaries,
       coldata <- all_genes[,1:3]
       coldata$Status <- as.factor(coldata$Status)
       coldata$DonorID <- as.factor(coldata$DonorID)
-      genecounts <- genecounts[which(apply(genecounts, 1, mean) > 5), ]
-      genecounts <- log(sweep(genecounts,2,apply(genecounts,2,mean),'/'))
-      genecounts[which(genecounts == '-Inf')] <- 0
+      genecounts <- genecounts[which(apply(genecounts, 1, mean) > 5), ] + 1
+      genecounts <- log(genecounts)
       genecounts <- t(genecounts[,rownames(coldata)])
       allcells <- cbind(coldata,genecounts)
 
@@ -1013,13 +1019,8 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
 
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -1030,7 +1031,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -1145,13 +1148,8 @@ error_hierarchicell <- function(data_summaries,
         message("----------------------------------------------")
       }
 
-      if (n_genes < 1000){
-        message("----------------------------------------------")
-        message("Number of genes is less than 1,000.\nA low number of genes affects the compositional component of the simulation\nand limits the stability of your type 1 error calculations")
-        message("----------------------------------------------")
-      }
 
-      if (cells_per_individual < 50){
+      if (cells_per_control < 50 | cells_per_case < 50){
         message("----------------------------------------------")
         message("Mean number of cells per individual is less than 50.\n The probability of complete separation will start to increase.")
         message("----------------------------------------------")
@@ -1162,7 +1160,9 @@ error_hierarchicell <- function(data_summaries,
                                                            n_per_group = n_per_group,
                                                            n_cases = n_cases,
                                                            n_controls = n_controls,
-                                                           cells_per_individual = cells_per_individual,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
                                                            foldchange = foldchange,
                                                            decrease_dropout = decrease_dropout,
                                                            alter_dropout_cases = alter_dropout_cases))
@@ -1187,8 +1187,7 @@ error_hierarchicell <- function(data_summaries,
       celldat <- BiocGenerics::estimateDispersions(celldat)
       results <- monocle::differentialGeneTest(celldat, fullModelFormulaStr = "~Status")
       results <- stats::na.omit(results)
-
-      pvalues <- as.numeric(results$pvalue)
+      pvalues <- as.numeric(results$pval)
 
       if (length(pval) == 1){
 
@@ -1269,6 +1268,270 @@ error_hierarchicell <- function(data_summaries,
 
       }
 
+  }  else if (method == "Pseudobulk_mean") {
+    if (!requireNamespace(c("DESeq2","tidyr"),quietly = TRUE)){
+      stop("The packages 'DESeq2', 'fitdistrplus', and \n
+           'tidyr' are required. Please install them.\n
+           It may be a problem with dependencies for these packages,\n
+           type '!requireNamespace(\"DESeq2\")' to see if this is the issue.",
+           call. = FALSE)
+    } else {
+
+      if (foldchange != 1){
+        message("----------------------------------------------")
+        message("Foldchange is not equal to 1, you are not simulating under the null.\nFor type 1 error rates, please keep foldchange equal to 1")
+        message("----------------------------------------------")
+      }
+
+
+      all_genes <- suppressMessages(simulate_hierarchicell(data_summaries,
+                                                           n_genes = n_genes,
+                                                           n_per_group = n_per_group,
+                                                           n_cases = n_cases,
+                                                           n_controls = n_controls,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
+                                                           foldchange = foldchange,
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
+
+      genecounts <- as.matrix(all_genes[,c(-1,-2,-3)])
+      genecounts <- genecounts[ ,which(apply(genecounts, 2, mean) > 5)]
+      genecounts <- cbind(all_genes[,1:2],genecounts)
+
+      computemeans <- function(x){tapply(x,genecounts[,2],mean)}
+      cellmeans <- sapply(genecounts[,c(-1,-2)],computemeans)
+      rownames(cellmeans) <- paste0(rownames(cellmeans),"_Mean")
+      coldata <- as.data.frame(cbind(rownames(cellmeans),rownames(cellmeans)))
+      colnames(coldata) <- c("SampleID","ToSep")
+      coldata <- tidyr::separate(coldata,ToSep,c("Status", "Donor_Number", "Mean"), sep="_")
+      rownames(coldata) <- coldata$SampleID
+      coldata$Status <- as.factor(coldata$Status)
+      coldata$Status <- stats::relevel(coldata$Status, "Control")
+      cellmeans <- round(t(cellmeans),0)
+      cellmeans <- cellmeans[, rownames(coldata)]
+
+
+      dsd <- suppressMessages(DESeq2::DESeqDataSetFromMatrix(countData = cellmeans, colData = coldata, design = ~ Status))
+      normFactors <- matrix(rep(1,(nrow(dsd)*ncol(dsd))),ncol=ncol(dsd),nrow=nrow(dsd),dimnames=list(1:nrow(dsd),1:ncol(dsd)))
+      normFactors <- normFactors / exp(rowMeans(log(normFactors)))
+      DESeq2::normalizationFactors(dsd) <- normFactors
+      dsd <- suppressMessages(DESeq2::DESeq(dsd))
+      res <- as.data.frame(DESeq2::results(dsd))
+      pvalues <- as.numeric(res$pvalue)
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(pvalues < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
+
     }
+
+  }else if (method == "Pseudobulk_sum") {
+    if (!requireNamespace(c("DESeq2","tidyr"),quietly = TRUE)){
+      stop("The packages 'DESeq2', 'fitdistrplus', and \n
+           'tidyr' are required. Please install them.\n
+           It may be a problem with dependencies for these packages,\n
+           type '!requireNamespace(\"DESeq2\")' to see if this is the issue.",
+           call. = FALSE)
+    } else {
+
+      if (foldchange != 1){
+        message("----------------------------------------------")
+        message("Foldchange is not equal to 1, you are not simulating under the null.\nFor type 1 error rates, please keep foldchange equal to 1")
+        message("----------------------------------------------")
+      }
+
+
+       all_genes <- suppressMessages(simulate_hierarchicell(data_summaries,
+                                                           n_genes = n_genes,
+                                                           n_per_group = n_per_group,
+                                                           n_cases = n_cases,
+                                                           n_controls = n_controls,
+                                                           cells_per_case = cells_per_case,
+                                                           cells_per_control = cells_per_control,
+                                                           ncells_variation_type = ncells_variation_type,
+                                                           foldchange = foldchange,
+                                                           decrease_dropout = decrease_dropout,
+                                                           alter_dropout_cases = alter_dropout_cases))
+
+      genecounts <- as.matrix(all_genes[,c(-1,-2,-3)])
+      genecounts <- genecounts[ ,which(apply(genecounts, 2, mean) > 5)]
+      genecounts <- cbind(all_genes[,1:2],genecounts)
+
+      computesums <- function(x){tapply(x,genecounts[,2],sum)}
+      cellsums <- sapply(genecounts[,c(-1,-2)],computesums)
+      rownames(cellsums) <- paste0(rownames(cellsums),"_sum")
+      coldata <- as.data.frame(cbind(rownames(cellsums),rownames(cellsums)))
+      colnames(coldata) <- c("SampleID","ToSep")
+      coldata <- tidyr::separate(coldata,ToSep,c("Status", "Donor_Number", "sum"), sep="_")
+      rownames(coldata) <- coldata$SampleID
+      coldata$Status <- as.factor(coldata$Status)
+      coldata$Status <- stats::relevel(coldata$Status, "Control")
+      cellsums <- round(t(cellsums),0)
+      cellsums <- cellsums[, rownames(coldata)]
+
+
+      dsd <- suppressMessages(DESeq2::DESeqDataSetFromMatrix(countData = cellsums, colData = coldata, design = ~ Status))
+      normFactors <- matrix(rep(1,(nrow(dsd)*ncol(dsd))),ncol=ncol(dsd),nrow=nrow(dsd),dimnames=list(1:nrow(dsd),1:ncol(dsd)))
+      normFactors <- normFactors / exp(rowMeans(log(normFactors)))
+      DESeq2::normalizationFactors(dsd) <- normFactors
+      dsd <- suppressMessages(DESeq2::DESeq(dsd))
+      res <- as.data.frame(DESeq2::results(dsd))
+      pvalues <- as.numeric(res$pvalue)
+
+      if (length(pval) == 1){
+
+        signif <- ifelse(pvalues < pval, 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval," is: ", rate))
+
+      } else if (length(pval) == 2) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+      } else if (length(pval) == 3) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+
+      } else if (length(pval) == 4) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+      } else if (length(pval) == 5) {
+
+        signif <- ifelse(pvalues < pval[1], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[1]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[2], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[2]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[3], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[3]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[4], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[4]," is: ", rate))
+
+        signif <- ifelse(pvalues < pval[5], 1, 0)
+        rate <- mean(signif)
+        message(paste0("Type 1 error for ",pval[5]," is: ", rate))
+
+      } else {
+
+        message("Too many pvalues, shorten vector of pvalues to 5 or less")
+
+      }
+
+    }
+
+  }
 
 }

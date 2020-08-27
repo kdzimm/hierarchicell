@@ -5,8 +5,8 @@
 \title{Computing Power for Single Cell Expression Case-Control Differential
   Expression Analysis}
 \description{
-Computes power for single cell data that is cell-type specifc,
-  hierarchical, and compositonal. This function computes power using random
+Computes power for single cell data that is cell-type specifc and
+  hierarchical. This function computes power using random
   effects to account for the correlation structure that exists among measures
   from cells within an individual. The power calculations will borrow
   information from the input data (or the package default data) to simulate

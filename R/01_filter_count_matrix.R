@@ -6,7 +6,7 @@
 #'   subsequent steps. The data loading and cleaning function is very basic, but
 #'   data input is critical to the package working correctly. If no input data
 #'   is given, the package defaults to using normal mucosal cells data for the
-#'   simulation and power calculations (see \code{\link{mucosal_cells}}).
+#'   simulation and power calculations (see \code{\link{alpha_cells}}).
 #'
 #' @details Input data should be formatted as follows:
 #'
@@ -37,8 +37,8 @@
 #' @param gene_thresh the mean expression threshold for retaining genes.
 #'   Defaults to 0.
 #' @param cell_thresh the mean expression threshold for retaining cells.
-#'   Defaults to 5.
-#' @return a data.frame that has filtered out cells with mean count < 5 and
+#'   Defaults to 0.
+#' @return a data.frame that has filtered out cells with mean count = 0 and
 #'   genes with mean count = 0
 #' @examples
 #'
@@ -60,8 +60,8 @@
 #' @export
 
 
-filter_counts <- function(expr=hierarchicell:::mucosal_cells, gene_thresh=0, cell_thresh=5){
-  if (identical(expr, hierarchicell:::mucosal_cells)){
+filter_counts <- function(expr=alpha_cells, gene_thresh=0, cell_thresh=0){
+  if (identical(expr,alpha_cells)){
     message("Filtering default dataset")
   } else {
     message("Filtering user input")

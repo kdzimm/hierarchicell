@@ -3,16 +3,16 @@
 \docType{package}
 \name{hierarchicell}
 \alias{hierarchicell}
-\title{hierarchicell: A package for simulating compositional, cell-type
-  specific, and hierarchical single-cell expression data}
+\title{hierarchicell: A package for simulating cell-type specific and
+  hierarchical single-cell expression data}
 \description{
 The hierarchicell package estimates important parameters from
   single-cell RNAseq expression counts before simulating expression data that
-  is compositional, cell-type specific, and hierarchical in nature. With the
-  simulated data, hierarchicell is then able to compute power calculations
-  under a variety of conditions. The package consists of four important
-  categories of functions: data loading and cleaning, empirical estimation of
-  distributions, simulating expression data, and computing power.
+  is cell-type specific and hierarchical in nature. With the simulated data,
+  hierarchicell is then able to compute power calculations under a variety of
+  conditions. The package consists of four important categories of functions:
+  data loading and cleaning, empirical estimation of distributions,
+  simulating expression data, and computing type 1 error or power.
 }
 \section{Data loading and filtering function}{
 

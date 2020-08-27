@@ -4,12 +4,18 @@
 \alias{compute_data_summaries}
 \title{Compute Data Summaries}
 \usage{
-compute_data_summaries(expr)
+compute_data_summaries(expr, type = "TPM")
 }
 \arguments{
 \item{expr}{a data.frame that has been output by filter_counts where the
 unique cell identifier is in column one and the sample identifier is in
 column two with the remaining columns all being genes.}
+
+\item{type}{an identifier for the type of data being submitted. If it is raw
+counts put "Raw", if it is TPM or some other counts per million then type
+"PerMillion". The program assumes data is in one of these two formats. Other
+normalizations (i.e., logs) that have negative values will cause the program
+to malfunction.}
 }
 \value{
 A data.frame of the summary data as well as two vectors for the
@@ -41,6 +47,6 @@ Data should be \strong{only for cells of the specific cell-type} you are
 }
 \examples{
 clean_expr_data <- filter_counts()
-data_summaries <- compute_data_summaries(clean_expr_data)
+data_summaries <- compute_data_summaries(clean_expr_data, type = "TPM")
 
 }

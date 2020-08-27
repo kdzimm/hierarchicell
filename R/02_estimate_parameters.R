@@ -23,6 +23,16 @@
 #'   datasets increase), this should improve dramatically.
 #'
 
+utils::globalVariables(c("Dispersion",
+                         "DonorID",
+                         "DropOut",
+                         "DropOutStD",
+                         "GrandMean",
+                         "InterStD",
+                         "IntraMean",
+                         "ToSep",
+                         "n_individuals"))
+
 NULL
 
 #'@title Compute Data Summaries
@@ -52,6 +62,12 @@ NULL
 #'  unique cell identifier is in column one and the sample identifier is in
 #'  column two with the remaining columns all being genes.
 #'
+#'@param type an identifier for the type of data being submitted. If it is raw
+#'  counts put "Raw", if it is TPM or some other counts per million then type
+#'  "PerMillion". The program assumes data is in one of these two formats. Other
+#'  normalizations (i.e., logs) that have negative values will cause the program
+#'  to malfunction.
+#'
 #'@return A data.frame of the summary data as well as two vectors for the
 #'  cell-wise dropout rates and library sizes. The data.frame includes the
 #'  gene-wise grand means, inter-individual standard deviations,
@@ -59,127 +75,107 @@ NULL
 #'
 #'@examples
 #'clean_expr_data <- filter_counts()
-#'data_summaries <- compute_data_summaries(clean_expr_data)
+#'data_summaries <- compute_data_summaries(clean_expr_data, type = "TPM")
 #'
 #'@export
 
-compute_data_summaries <- function(expr){
+compute_data_summaries <- function(expr,
+                                   type = "TPM"){
 
-  n_individuals <- length(unique(expr[,2]))
+  if (type == "Raw"){
 
-  message("Computing cell-wise summaries ... ")
+    n_individuals <- length(unique(expr[,2]))
 
-  compute_drop <- function(a){length(a[which(a == 0)])/length(a)}
-  cell_dropout <- apply(expr[,c(-1,-2)],1,compute_drop) #Compute cell dropout
-  cell_libraries <- apply(expr[,c(-1,-2)],1,sum) #Compute library size
+    message("Normalizing ... ")
 
-  message("Normalizing data ...")
+    ids <- expr[,c(1,2)]
+    expr <- expr[,c(-1,-2)]
+    expr <- t(as.matrix(apply(expr,1,function(x){(x/sum(x))*1000000}))) #RPM
+    expr <- cbind(ids,expr)
 
-  ids <- expr[,c(1,2)]
-  expr <- expr[,c(-1,-2)]
-  expr <- t(as.matrix(apply(expr,1,function(x){-log((x/sum(x)))}))) #Normalize
-  expr[expr == 'Inf'] <- 0
-  expr <- as.data.frame(cbind(ids,expr))
+    message("Removing highly correlated genes")
 
-  message("Computing sample means and standard deviations ... ")
+    reduced <- expr[,c(-1,-2)]
+    genelist <- colnames(reduced)
+    uncorrelatedgenes <- ids
 
-  computesd <- function(a){tapply(a,expr[,2],stats::sd)}
-  temp.intrasd <- sapply(expr[,c(-1,-2)],computesd)
-  rownames(temp.intrasd) <- paste0(rownames(temp.intrasd),"_SD") #Compute sample SDs
+    for (i in 1:500){
+      genename <- sample(genelist,1)
+      drawngene <- reduced[,genename]
+      uncorrelatedgenes <- cbind(uncorrelatedgenes,drawngene)
+      correlations <- abs(stats::cor(drawngene,reduced))
+      genelist <- names(correlations[,which(correlations < 0.25)])
+      reduced <- reduced[,genelist]
+      if (ncol(reduced) < 10) break
+    }
 
-  computemeans <- function(x){tapply(x,expr[,2],mean)}
-  temp.intrameans <- sapply(expr[,c(-1,-2)],computemeans)
-  rownames(temp.intrameans) <- paste0(rownames(temp.intrameans),"_Mean") #Compute sample means
+    expr <- uncorrelatedgenes
+    rm(ids,uncorrelatedgenes,genelist,correlations,drawngene,genename,reduced)
 
-  temp.intra <- as.data.frame(t(do.call("rbind",list(temp.intrameans,temp.intrasd))))
+    message("Computing sample means, dropout rates, and dispersion ... ")
 
-  message("Computing final data summaries ... ")
+    computevar <- function(a){tapply(a,expr[,2],function(a){stats::var(a[a != 0])})}
+    temp.intravar <- sapply(expr[,c(-1,-2)],computevar)
+    rownames(temp.intravar) <- paste0(rownames(temp.intravar),"_Var") #Compute sample variances
 
-  temp.intra$InterStD <- apply(temp.intra[,1:n_individuals],1,stats::sd) #Compute inter SD
-  temp.intra$GrandMean <- apply(temp.intra[,1:n_individuals],1,mean) #Compute grand mean
-  temp.intra$GrandMeanSq <- temp.intra$GrandMean**2
-  temp.intra$IntraStD <- apply(temp.intra[,(1+n_individuals):(n_individuals*2)],1,stats::median) #Compute intra SD
-  temp.intra$DropOut <- apply(expr[,c(-1,-2)],2,compute_drop) #Compute gene dropout
-  main_summary <- as.data.frame(temp.intra)
+    computemeans <- function(x){tapply(x,expr[,2],function(a){mean(a[a != 0])})}
+    temp.intrameans <- sapply(expr[,c(-1,-2)],computemeans)
+    rownames(temp.intrameans) <- paste0(rownames(temp.intrameans),"_Mean") #Compute sample means
 
-  list(cell_libraries,cell_dropout,n_individuals,main_summary)
-}
+    computedrop <- function(x){tapply(x,expr[,2],function(a){length(a[which(a == 0)])/length(a)})}
+    temp.drop <- sapply(expr[,c(-1,-2)],computedrop)
+    rownames(temp.drop) <- paste0(rownames(temp.drop),"_Drop") #Compute sample dropout
 
+    intravar <- na.omit(as.data.frame(cbind(c(temp.intravar),c(temp.intrameans)))) #Compute sample dispersion
+    colnames(intravar) <- c("IntraVar","IntraMean")
+    intravar$Dispersion <- (intravar$IntraMean**2)/((intravar$IntraVar) - intravar$IntraMean)
 
-#'@title Approximate Library Size Distribution
-#'
-#'@rdname approximate_library_sizes
-#'
-#'@description This function estimates the parameters for the lognormal
-#'  distribution of the library sizes.
-#'
-#'@details Prior to estimating the simulation parameters, it is important to run
-#'  the compute_data_summaries function to build an object that is in the right
-#'  format for the following estimation functions to properly compute.The
-#'  'fitdistrplus' package is required for this function to work. Please install
-#'  it.
-#'
-#'@param data_summaries an R object that has been output by the package's
-#'  compute_data_summaries function.
-#'
-#'@return A vector of length two, where the first number is the mean of the
-#'  lognormal distribution and the second number is the standard deviation of
-#'  the lognormal distribution
-#'
-#'@examples
-#'data_summaries <- compute_data_summaries(clean_expr_data)
-#'library_params <- approximate_library_sizes(data_summaries)
-#'
-#'@export
+    message("Computing final data summaries ... ")
 
+    temp.intra <- as.data.frame(t(do.call("rbind",list(temp.intrameans,temp.intravar,temp.drop))))
+    temp.intra$InterStD <- apply(temp.intra[,1:n_individuals],1,function(a){stats::sd(a[!is.na(a)])}) #Compute inter SD
+    temp.intra$GrandMean <- apply(temp.intra[,1:n_individuals],1,function(a){mean(a[!is.na(a)])}) #Compute grand mean
+    temp.intra$DropOut <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){mean(a[!is.na(a)])}) #Compute gene dropout
+    temp.intra$DropOutStD <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){stats::sd(a[!is.na(a)])})
 
-approximate_library_sizes <- function(data_summaries){
-  if (!requireNamespace("fitdistrplus",quietly = TRUE)) {
-    stop("The 'fitdistrplus' package is required for this function to work. Please install it",
-         call. = FALSE)
+    main_summary <- as.data.frame(temp.intra)
+
+    list(n_individuals,main_summary,intravar)
+
   } else {
-  cell_library <- fitdistrplus::fitdist(data_summaries[[1]], "lnorm",method = "mle")
-  cell_library_mean <- cell_library$estimate[1]
-  cell_library_sd <- cell_library$estimate[2]
-  as.numeric(c(cell_library_mean,cell_library_sd))
-  }
-}
 
-#'@title Approximate Cell Dropout Distribution
-#'
-#'@rdname approximate_cell_dropout
-#'
-#'@description This function estimates the parameters for the normal
-#'  distribution of cell dropout.
-#'
-#'@details Prior to estimating the simulation parameters, it is important to run
-#'  the compute_data_summaries function to build an object that is in the right
-#'  format for the following estimation functions to properly compute. The
-#'  'fitdistrplus' package is required for this function to work. Please install
-#'  it.
-#'
-#'@param data_summaries an R object that has been output by the package's
-#'  compute_data_summaries function.
-#'
-#'@return A vector of length two, where the first number is the mean of the
-#'  normal distribution and the second number is the standard deviation of the
-#'  normal distribution
-#'
-#'@examples
-#'data_summaries <- compute_data_summaries(clean_expr_data)
-#'cell_drop_params <- approximate_cell_dropout(data_summaries)
-#'
-#'@export
+    n_individuals <- length(unique(expr[,2]))
 
-approximate_cell_dropout <- function(data_summaries){
-  if (!requireNamespace("fitdistrplus",quietly = TRUE)){
-    stop("The 'fitdistrplus' package is required for this function to work. Please install it",
-         call. = FALSE)
-  } else {
-  cell_dropout <- fitdistrplus::fitdist(data_summaries[[2]], "norm",method = "mle")
-  cell_dropout_mean <- cell_dropout$estimate[1]
-  cell_dropout_sd <- cell_dropout$estimate[2]
-  as.numeric(c(cell_dropout_mean,cell_dropout_sd))
+    message("Computing sample means, dropout rates, and dispersion ... ")
+
+    computevar <- function(a){tapply(a,expr[,2],function(a){stats::var(a[a != 0])})}
+    temp.intravar <- sapply(expr[,c(-1,-2)],computevar)
+    rownames(temp.intravar) <- paste0(rownames(temp.intravar),"_Var") #Compute sample variances
+
+    computemeans <- function(x){tapply(x,expr[,2],function(a){mean(a[a != 0])})}
+    temp.intrameans <- sapply(expr[,c(-1,-2)],computemeans)
+    rownames(temp.intrameans) <- paste0(rownames(temp.intrameans),"_Mean") #Compute sample means
+
+    computedrop <- function(x){tapply(x,expr[,2],function(a){length(a[which(a == 0)])/length(a)})}
+    temp.drop <- sapply(expr[,c(-1,-2)],computedrop)
+    rownames(temp.drop) <- paste0(rownames(temp.drop),"_Drop") #Compute sample dropout
+
+    intravar <- na.omit(as.data.frame(cbind(c(temp.intravar),c(temp.intrameans)))) #Compute sample dispersion
+    colnames(intravar) <- c("IntraVar","IntraMean")
+    intravar$Dispersion <- (intravar$IntraMean**2)/((intravar$IntraVar) - intravar$IntraMean)
+
+    message("Computing final data summaries ... ")
+
+    temp.intra <- as.data.frame(t(do.call("rbind",list(temp.intrameans,temp.intravar,temp.drop))))
+    temp.intra$InterStD <- apply(temp.intra[,1:n_individuals],1,function(a){stats::sd(a[!is.na(a)])}) #Compute inter SD
+    temp.intra$GrandMean <- apply(temp.intra[,1:n_individuals],1,function(a){mean(a[!is.na(a)])}) #Compute grand mean
+    temp.intra$DropOut <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){mean(a[!is.na(a)])}) #Compute gene dropout
+    temp.intra$DropOutStD <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){stats::sd(a[!is.na(a)])})
+
+    main_summary <- as.data.frame(temp.intra)
+
+    list(n_individuals,main_summary,intravar)
+
   }
 }
 
@@ -204,6 +200,7 @@ approximate_cell_dropout <- function(data_summaries){
 #'  distribution
 #'
 #'@examples
+#'clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
 #'gene_mean_params <- approximate_gene_mean(data_summaries)
 #'
@@ -214,8 +211,9 @@ approximate_gene_mean <- function(data_summaries){
     stop("The 'fitdistrplus' package is required for this function to work. Please install it",
          call. = FALSE)
   } else {
-  data_summaries <- data_summaries[[4]]
+  data_summaries <- na.omit(data_summaries[[2]])
   data_summaries <- data_summaries[which(data_summaries$GrandMean > 0), ]
+  data_summaries <- data_summaries[which(data_summaries$GrandMean < 10000), ]
   gene_mean <- fitdistrplus::fitdist(data_summaries$GrandMean, "gamma",method = "mle")
   gene_mean_shape <- gene_mean$estimate[1]
   gene_mean_rate <- gene_mean$estimate[2]
@@ -223,12 +221,123 @@ approximate_gene_mean <- function(data_summaries){
   }
 }
 
-#'@title Model Gene Dropout as a Linear Function of the Grand Mean
+#'@title Model Dispersion as a function of Intra Means
 #'
-#'@rdname model_gene_drop
+#'@rdname model_dispersion
 #'
-#'@description This function models gene dropout as a logit function of the
-#'  grand mean. Visualizing this fit and looking for oddities and extreme
+#'@description This function estimates the parameters for the gamma distribution
+#'  of dispersion parameters.
+#'
+#'@details Prior to estimating the simulation parameters, it is important to run
+#'  the compute_data_summaries function to build an object that is in the right
+#'  format for the following estimation functions to properly compute.The
+#'  'fitdistrplus' package is required for this function to work. Please install
+#'  it
+#'
+#'@param data_summaries an R object that has been output by the package's
+#'  compute_data_summaries function.
+#'
+#'@param plot a TRUE/FALSE statement for the output of a plot to observe how
+#'  well gene dropout behaves as a function of the intra means
+#'
+#'@return A vector of length two, where the first number is the shape of the
+#'  gamma distribution and the second number is the rate of the gamma
+#'  distribution
+#'
+#'@examples
+#'clean_expr_data <- filter_counts()
+#'data_summaries <- compute_data_summaries(clean_expr_data)
+#'dispersion_params <- model_dispersion(data_summaries)
+#'
+#'@export
+
+model_dispersion <- function(data_summaries, plot=FALSE){
+  if ((plot == TRUE)) {
+    if (!requireNamespace("ggplot2",quietly = TRUE)){
+      stop("The 'ggplot2' package is required for plotting. Please install it",
+           call. = FALSE)
+    } else {
+      data_summaries <- na.omit(data_summaries[[3]])
+      data_summaries <- data_summaries[which(data_summaries$Dispersion > 0),]
+
+      message("Plotting dispersion")
+
+      suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=IntraMean,y=Dispersion),
+                                       environment = environment()) +
+                         ggplot2::geom_point() +
+                         ggplot2::stat_smooth(method="glm",
+                                              formula = y ~ I(1/x), size = 1,
+                                              method.args = list(family = gaussian(link = "log"))) +
+                         ggplot2::ggsave("Dispersion.pdf"))
+
+      suppressWarnings(temp <- stats::glm(data = data_summaries, Dispersion ~ I(1/IntraMean), family = gaussian(link = "log")))
+      suppressWarnings(temp <- summary(temp))
+      disp.beta0 <- temp$coefficients[1,1]
+      disp.beta1 <- temp$coefficients[2,1]
+      as.numeric(c(disp.beta0,disp.beta1))
+    }
+  } else {
+    data_summaries <- na.omit(data_summaries[[3]])
+    data_summaries <- data_summaries[which(data_summaries$Dispersion > 0),]
+    temp <- stats::glm(data = data_summaries, Dispersion ~ I(1/IntraMean), family = gaussian(link = "log"))
+    suppressWarnings(temp <- summary(temp))
+    disp.beta0 <- temp$coefficients[1,1]
+    disp.beta1 <- temp$coefficients[2,1]
+    as.numeric(c(disp.beta0,disp.beta1))
+
+  }
+}
+
+
+#'@title Approximate Gene Dropout as a gamma
+#'
+#'@rdname approximate_gene_drop
+#'
+#'@description This function estimates the parameters for the gamma distribution
+#'  of gene dropout.
+#'
+#'@details Prior to estimating the simulation parameters, it is important to run
+#'  the compute_data_summaries function to build an object that is in the right
+#'  format for the following estimation functions to properly compute. The
+#'  'ggplot2' package is required for the plotting component of this function to
+#'  work. Please install it.
+#'
+#'@param data_summaries an R object that has been output by the package's
+#'  compute_data_summaries function.
+#'
+#'
+#'@return A vector of length two, where the first number is the shape of the
+#'  gamma distribution and the second number is the rate of the gamma
+#'  distribution
+#'
+#'@examples
+#'clean_expr_data <- filter_counts()
+#'data_summaries <- compute_data_summaries(clean_expr_data)
+#'gene_drop_params <- approximate_gene_drop(data_summaries)
+#'
+#'@export
+
+approximate_gene_drop <- function(data_summaries){
+    if (!requireNamespace("fitdistrplus",quietly = TRUE)){
+      stop("The 'fitdistrplus' package is required for this function to work. Please install it",
+           call. = FALSE)
+    } else {
+      data_summaries <- data_summaries[[2]]
+      data_summaries$DropOut <- 1 - data_summaries$DropOut
+      data_summaries <- data_summaries[which(data_summaries$DropOut > 0), ]
+      drop_gamma <- fitdistrplus::fitdist(data_summaries$DropOut, "gamma",method = "mle")
+      drop_shape <- drop_gamma$estimate[1]
+      drop_rate <- drop_gamma$estimate[2]
+      as.numeric(c(drop_shape,drop_rate))
+    }
+}
+
+#'@title Model Dropout SD as a Quadratic Function of the Mean Dropout
+#'
+#'@rdname model_drop_sd
+#'
+#'@description This function models gene dropout SD as a quadratic function of the
+#'  dropout mean. Visualizing this fit and looking for oddities and extreme
 #'  outliers may be helpful.
 #'
 #'@details Prior to estimating the simulation parameters, it is important to run
@@ -241,69 +350,65 @@ approximate_gene_mean <- function(data_summaries){
 #'  compute_data_summaries function.
 #'
 #'@param plot a TRUE/FALSE statement for the output of a plot to observe how
-#'  well gene dropout behaves as a logit function of the grand mean
+#'  well gene dropout SD behaves as a quadratic function of mean dropout
 #'
-#'@return A plot (if plot=TRUE) and a vector of length three, where the first
-#'  number is the estimate of the r value (growth rate) and the second and third
-#'  numbers are the estimate of the initial size and carrying capacity,
-#'  respectively. The estimate of the carrying capacity should be close to one
-#'  and the initial size close to zero.
+#'@return A plot (if plot=TRUE) and a vector of length three, where each
+#'  number is the estimate of the intercept or slope for the model.
 #'
 #'@examples
+#'clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'gene_drop_betas <- model_gene_drop(data_summaries)
+#'gene_drop_betas <- model_drop_sd(data_summaries)
 #'
 #'@export
 
-model_gene_drop <- function(data_summaries, plot=FALSE){
+model_drop_sd <- function(data_summaries, plot=FALSE){
   if ((plot == TRUE)) {
     if (!requireNamespace("ggplot2",quietly = TRUE)){
-    stop("The 'ggplot2' package is required for plotting. Please install it",
-         call. = FALSE)
+      stop("The 'ggplot2' package is required for plotting. Please install it",
+           call. = FALSE)
     } else {
-    n_individuals <- data_summaries[[3]]
-    data_summaries <- data_summaries[[4]]
-    data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
-    data_summaries$DropOut <- 1 - data_summaries$DropOut
-    message("Plotting gene-wise dropout")
+      n_individuals <- data_summaries[[1]]
+      data_summaries <- na.omit(data_summaries[[2]])
+      message("Plotting dropout")
 
-    gc_fit <- growthcurver::SummarizeGrowth(data_summaries$GrandMean, data_summaries$DropOut)
-    data_summaries$Predicted_Curve <- stats::predict(gc_fit$model)
+      suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=DropOut,y=DropOutStD),
+                                       environment = environment()) +
+                         ggplot2::geom_point() +
+                         ggplot2::stat_smooth(method = "glm", formula = y ~ x + I(x**2), fullrange = TRUE) +
+                         ggplot2::ylim(c(0,1)) +
+                         ggplot2::ggsave("Gene_Dropout_StD.pdf"))
 
-    ggplot2::ggplot(data_summaries,ggplot2::aes(x=GrandMean,y=DropOut),
-                      environment = environment()) +
-      ggplot2::geom_point() +
-      ggplot2::geom_line(data=data_summaries, ggplot2::aes(y=data_summaries$Predicted_Curve), size = 1, color = "red") +
-      ggplot2::ylim(c(0,1))
-      ggplot2::ggsave("Gene_Dropout.pdf")
-
-    dropout.r <- gc_fit$vals$r
-    dropout.N_0 <- gc_fit$vals$n0
-    dropout.K <- gc_fit$vals$k
-    as.numeric(c(dropout.r,dropout.N_0,dropout.K))
+      suppressWarnings(temp <- stats::glm(data = data_summaries, DropOutStD ~ DropOut + I(DropOut**2)))
+      suppressWarnings(temp <- summary(temp))
+      drop.beta0 <- temp$coefficients[1,1]
+      drop.beta1 <- temp$coefficients[2,1]
+      drop.beta2 <- temp$coefficients[3,1]
+      as.numeric(c(drop.beta0,drop.beta1,drop.beta2))
     }
   } else {
-    n_individuals <- data_summaries[[3]]
-    data_summaries <- data_summaries[[4]]
-    data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
-    data_summaries$DropOut <- 1 - data_summaries$DropOut
-    gc_fit <- growthcurver::SummarizeGrowth(data_summaries$GrandMean, data_summaries$DropOut)
-    data_summaries$Predicted_Curve <- stats::predict(gc_fit$model)
-    dropout.r <- gc_fit$vals$r
-    dropout.N_0 <- gc_fit$vals$n0
-    dropout.K <- gc_fit$vals$k
-    as.numeric(c(dropout.r,dropout.N_0,dropout.K))
+    n_individuals <- data_summaries[[1]]
+    data_summaries <- na.omit(data_summaries[[2]])
+
+    suppressWarnings(temp <- stats::glm(data = data_summaries, DropOutStD ~ DropOut + I(DropOut**2)))
+    suppressWarnings(temp <- summary(temp))
+    drop.beta0 <- temp$coefficients[1,1]
+    drop.beta1 <- temp$coefficients[2,1]
+    drop.beta2 <- temp$coefficients[3,1]
+    as.numeric(c(drop.beta0,drop.beta1,drop.beta2))
+
   }
 }
 
-#'@title Model Inter-Individual Heterogeneity as a Quadratic Function of the
-#'  Grand Mean
+
+#'@title Model Inter-Individual Heterogeneity as a Linear Function of the Grand
+#'  Mean
 #'
 #'@rdname model_inter
 #'
-#'@description This function models inter-individual heterogeneity as a
-#'  quadratic function of the grand mean. Visualizing this fit and looking for
-#'  oddities and extreme outliers may be helpful.
+#'@description This function models inter-individual heterogeneity as a log
+#'  function of the grand mean. Visualizing this fit and looking for oddities
+#'  and extreme outliers may be helpful.
 #'
 #'@details Prior to estimating the simulation parameters, it is important to run
 #'  the compute_data_summaries function to build an object that is in the right
@@ -315,14 +420,15 @@ model_gene_drop <- function(data_summaries, plot=FALSE){
 #'  compute_data_summaries function.
 #'
 #'@param plot a TRUE/FALSE statement for the output of a plot to observe how
-#'  well inter-individual standard deviation behaves as a quadratic function of
-#'  the grand mean
+#'  well inter-individual standard deviation behaves as a linear function of the
+#'  grand mean
 #'
-#'@return A plot (if plot=TRUE) and a vector of length two, where the first
-#'  number is the estimate of beta1 and the second number is the estimate of
-#'  beta2 (function is forced through the origin, so intercept is zero).
+#'@return A plot (if plot=TRUE) a vector of length two, where the first
+#'  number is the estimate of the intercept for the log model second number is
+#'  the estimate of the slope for the log model.
 #'
 #'@examples
+#'clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
 #'inter_betas <- model_inter(data_summaries)
 #'
@@ -334,104 +440,29 @@ model_inter <- function(data_summaries, plot=FALSE){
       stop("The 'ggplot2' package is required for plotting. Please install it",
            call. = FALSE)
     } else {
-      n_individuals <- data_summaries[[3]]
-      data_summaries <- data_summaries[[4]]
-      data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
+      n_individuals <- data_summaries[[1]]
+      data_summaries <- na.omit(data_summaries[[2]])
 
       message("Plotting inter-individual standard deviation")
 
-      ggplot2::ggplot(data_summaries,ggplot2::aes(x=GrandMean,y=InterStD),
+      suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=GrandMean,y=InterStD),
                       environment = environment()) +
-        ggplot2::geom_point() +
-        ggplot2::stat_smooth(method="lm",
-                             formula = y ~ 0 + x + I(x**2), size = 1)
-      ggplot2::ggsave("Inter_Sample_Heterogeneity.pdf")
+      ggplot2::geom_point() +
+      ggplot2::stat_smooth(method="glm",
+                             formula = y ~ 0 + x, size = 1) +
+      ggplot2::ggsave("Inter_Sample_Heterogeneity.pdf"))
 
-      temp <- stats::lm(data = data_summaries, InterStD ~ 0 + GrandMean + GrandMeanSq)
-      temp <- summary(temp)
+      suppressWarnings(temp <- stats::glm(data = data_summaries, InterStD ~ 0 + GrandMean))
+      suppressWarnings(temp <- summary(temp))
       inter.beta1 <- temp$coefficients[1,1]
-      inter.beta2 <- temp$coefficients[2,1]
-      as.numeric(c(inter.beta1,inter.beta2))
+      as.numeric(inter.beta1)
     }
   } else {
-    n_individuals <- data_summaries[[3]]
-    data_summaries <- data_summaries[[4]]
-    data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
-    temp <- stats::lm(data = data_summaries, InterStD ~ 0 + GrandMean + GrandMeanSq)
-    temp <- summary(temp)
+    n_individuals <- data_summaries[[1]]
+    data_summaries <- na.omit(data_summaries[[2]])
+    suppressWarnings(temp <- stats::glm(data = data_summaries, InterStD ~ 0 + GrandMean))
+    suppressWarnings(temp <- summary(temp))
     inter.beta1 <- temp$coefficients[1,1]
-    inter.beta2 <- temp$coefficients[2,1]
-    as.numeric(c(inter.beta1,inter.beta2))
-  }
-}
-
-#'@title Model Intra-Individual Variance as a Quadratic Function of the Grand
-#'  Mean
-#'
-#'@rdname model_intra
-#'
-#'@description This function models intra-individual standard deviation as a
-#'  quadratic function of the grand mean. Visualizing this fit and looking for
-#'  oddities and extreme outliers may be helpful.
-#'
-#'@details Prior to estimating the simulation parameters, it is important to run
-#'  the compute_data_summaries function to build an object that is in the right
-#'  format for the following estimation functions to properly compute. The
-#'  'ggplot2' package is required for the plotting component of this function to
-#'  work. Please install it.
-#'
-#'@param data_summaries an R object that has been output by the package's
-#'  compute_data_summaries function.
-#'
-#'@param plot a TRUE/FALSE statement for the output of a plot to observe how
-#'  well intra-individual standard deviation behaves as a quadratic function of
-#'  the grand mean
-#'
-#'@return A plot (if plot=TRUE) and a vector of length three, where the first
-#'  number is the estimate of beta0 (the intercept) and the second and third
-#'  numbers are the estimates of beta1 and beta2, respectively.
-#'
-#'@examples
-#'data_summaries <- compute_data_summaries(clean_expr_data)
-#'intra_betas <- model_intra(data_summaries)
-#'
-#'@export
-
-model_intra <- function(data_summaries, plot=FALSE){
-  if ((plot == TRUE)) {
-    if (!requireNamespace("ggplot2",quietly = TRUE)){
-      stop("The 'ggplot2' package is required for plotting. Please install it",
-           call. = FALSE)
-    } else {
-      n_individuals <- data_summaries[[3]]
-      data_summaries <- data_summaries[[4]]
-      data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
-
-      message("Plotting intra-individual standard deviation")
-
-      ggplot2::ggplot(data_summaries,ggplot2::aes(x=GrandMean,y=IntraStD),
-                      environment = environment()) +
-        ggplot2::geom_point() +
-        ggplot2::stat_smooth(method="lm",
-                             formula = y ~ x + I(x**2), size = 1)
-      ggplot2::ggsave("Intra_Sample_Variance.pdf")
-
-      temp <- stats::lm(data = data_summaries, IntraStD ~ GrandMean + GrandMeanSq)
-      temp <- summary(temp)
-      intra.beta0 <- temp$coefficients[1,1]
-      intra.beta1 <- temp$coefficients[2,1]
-      intra.beta2 <- temp$coefficients[3,1]
-      as.numeric(c(intra.beta0,intra.beta1,intra.beta2))
-    }
-  } else {
-    n_individuals <- data_summaries[[3]]
-    data_summaries <- data_summaries[[4]]
-    data_summaries <- data_summaries[apply(data_summaries[,1:n_individuals],1,function(x){all(x != 0)}), ]
-    temp <- stats::lm(data = data_summaries, IntraStD ~ GrandMean + GrandMeanSq)
-    temp <- summary(temp)
-    intra.beta0 <- temp$coefficients[1,1]
-    intra.beta1 <- temp$coefficients[2,1]
-    intra.beta2 <- temp$coefficients[3,1]
-    as.numeric(c(intra.beta0,intra.beta1,intra.beta2))
+    as.numeric(inter.beta1)
   }
 }
