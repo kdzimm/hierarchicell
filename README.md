@@ -36,5 +36,6 @@ number of genes, number of samples (i.e., independent experimental units),
 and the mean number of cells per individual. Power can be calculated for 
 either binary or continuous outcomes of interest. 
 
-# installation
+# Installation
 
+> devtools::install_github("kdzimm/hierarchicell")
