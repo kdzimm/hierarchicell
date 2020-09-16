@@ -125,17 +125,14 @@ NULL
 #'  observe the global behavior of your simulated data. Seurat will need to be
 #'  installed for this function to properly work. Defaults to FALSE.
 #'
-#'@param plot_name a character string preferrably containing no spaces for the
-#'  name of the pdf file where the tSNE plot will be stored. Defaults to
-#'  "tSNE_Simulated_Data".
 #'
 #'@return A data.frame of the simulated data or potentially a pdf of a tSNE plot
 #'  (if tSNE_plot=TRUE).
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'simulated_counts <- simulate_hierarchicell(data_summaries)
+#'simulated_counts <- simulate_hierarchicell(data_summaries)}
 #'
 #'@export
 
@@ -150,8 +147,7 @@ simulate_hierarchicell <- function(data_summaries,
                                    foldchange = 1,
                                    decrease_dropout = 0,
                                    alter_dropout_cases = 0,
-                                   tSNE_plot = FALSE,
-                                   plot_name="tSNE_Simulated_Data"){
+                                   tSNE_plot = FALSE){
 
    if ((tSNE_plot == TRUE)) {
     if (!requireNamespace("Seurat",quietly = TRUE)){
@@ -299,9 +295,7 @@ simulate_hierarchicell <- function(data_summaries,
       all <- Seurat::FindClusters(all)
       all <- Seurat::RunTSNE(all)
 
-      grDevices::pdf(paste0(plot_name,".pdf"))
       print(Seurat::DimPlot(object = all,reduction = "tsne",group.by="DonorID"))
-      grDevices::dev.off()
 
     }
 
@@ -515,17 +509,13 @@ simulate_hierarchicell <- function(data_summaries,
 #'  observe the global behavior of your simulated data. Seurat will need to be
 #'  installed for this function to properly work. Defaults to FALSE.
 #'
-#'@param plot_name a character string preferrably containing no spaces for the
-#'  name of the pdf file where the tSNE plot will be stored. Defaults to
-#'  "tSNE_Simulated_Continuous_Data".
-#'
 #'@return A data.frame of the simulated data or potentially a pdf of a tSNE plot
 #'  (if tSNE_plot=TRUE).
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'simulated_counts <- simulate_hierarchicell_continuous(data_summaries)
+#'simulated_counts <- simulate_hierarchicell_continuous(data_summaries)}
 #'
 #'@export
 
@@ -538,8 +528,7 @@ simulate_hierarchicell_continuous <- function(data_summaries,
                                    continuous_mean = 0,
                                    continuous_sd = 1,
                                    decrease_dropout = 0,
-                                   tSNE_plot = FALSE,
-                                   plot_name="tSNE_Simulated_Continuous_Data"){
+                                   tSNE_plot = FALSE){
 
     if ((tSNE_plot == TRUE)) {
       if (!requireNamespace("Seurat",quietly = TRUE)){
@@ -686,9 +675,7 @@ simulate_hierarchicell_continuous <- function(data_summaries,
         all <- Seurat::FindClusters(all)
         all <- Seurat::RunTSNE(all, check_duplicates=F)
 
-        #grDevices::pdf(paste0(plot_name,".pdf"))
         print(Seurat::FeaturePlot(object = all,features = "Outcome"))
-        #grDevices::dev.off()
 
       }
 

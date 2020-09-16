@@ -1,19 +1,18 @@
 Package: hierarchicell
-Title: Simulating cell-type specific and hierarchical scRNA-seq data
-Version: 0.0.0.9000
+Title: Simulating Cell-Type Specific and Hierarchical Single-Cell RNA-Seq Data
+Version: 1.0.0
 Authors@R: 
     person(given = "Kip",
            family = "Zimmerman",
            role = c("aut", "cre"),
            email = "kdzimmer@wakehealth.edu",
            comment = c(ORCID = "0000-0002-2943-6612"))
-Description: The hierarchicell package estimates important parameters from single-cell
-    RNA-seq expression counts before simulating expression data that is cell-type 
-    specific and hierarchical in nature. With the simulated data, hierarchicell 
-    is then able to compute power calculations under a variety of conditions. 
-    The package consists of four important categories of functions: data loading 
-    and cleaning, empirical estimation of distributions, simulating expression 
-    data, and computing power or type 1 error.
+Description: A simulation engine that estimates important parameters from single-cell RNA-seq expression 
+    counts to simulate expression data that are cell-type specific and hierarchical in nature. The simulated 
+    data can then be used to compute power and type 1 error calculations under a variety of conditions. The 
+    package consists of four important categories of functions: data loading and cleaning, empirical 
+    estimation of distributions, simulating expression data, and computing power or type 1 error. 
+    KD Zimmerman, MA Espeland, CD Langefeld (2020) <doi:10.1101/2020.01.15.906248>.
 Depends: R (>= 3.4.0)
 License: CC0
 Encoding: UTF-8
@@ -43,3 +42,7 @@ Imports:
     methods,
     grDevices,
     DESeq2
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

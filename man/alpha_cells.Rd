@@ -8,5 +8,6 @@
 \url{https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-5061/}
 }
 \description{
-A dataset containing the gene expression counts for 443 healthy pancreatic alpha cells
+A dataset containing the gene expression counts for 443 healthy pancreatic
+alpha cells. Highly correlated genes have been removed to reduce data size.
 }

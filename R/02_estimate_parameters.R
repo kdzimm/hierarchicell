@@ -63,10 +63,10 @@ NULL
 #'  column two with the remaining columns all being genes.
 #'
 #'@param type an identifier for the type of data being submitted. If it is raw
-#'  counts put "Raw", if it is TPM or some other counts per million then type
-#'  "PerMillion". The program assumes data is in one of these two formats. Other
-#'  normalizations (i.e., logs) that have negative values will cause the program
-#'  to malfunction.
+#'  counts put "Raw", if it is TPM or some other normalized counts per million
+#'  then type "PerMillion" or "Norm". The program assumes data is in one of
+#'  these two formats. Other normalizations (i.e., logs) that have negative
+#'  values will cause the program to malfunction.
 #'
 #'@return A data.frame of the summary data as well as two vectors for the
 #'  cell-wise dropout rates and library sizes. The data.frame includes the
@@ -74,13 +74,13 @@ NULL
 #'  intra-individual standard deviations, and dropout rates.
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
-#'data_summaries <- compute_data_summaries(clean_expr_data, type = "TPM")
+#'\donttest{clean_expr_data <- filter_counts()
+#'data_summaries <- compute_data_summaries(clean_expr_data, type = "Norm")}
 #'
 #'@export
 
 compute_data_summaries <- function(expr,
-                                   type = "TPM"){
+                                   type = "Norm"){
 
   if (type == "Raw"){
 
@@ -133,11 +133,11 @@ compute_data_summaries <- function(expr,
     message("Computing final data summaries ... ")
 
     temp.intra <- as.data.frame(t(do.call("rbind",list(temp.intrameans,temp.intravar,temp.drop))))
-    temp.intra$InterStD <- apply(temp.intra[,1:n_individuals],1,function(a){stats::sd(a[!is.na(a)])}) #Compute inter SD
-    temp.intra$GrandMean <- apply(temp.intra[,1:n_individuals],1,function(a){mean(a[!is.na(a)])}) #Compute grand mean
-    temp.intra$DropOut <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){mean(a[!is.na(a)])}) #Compute gene dropout
-    temp.intra$DropOutStD <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){stats::sd(a[!is.na(a)])})
-
+    temp.intra$InterStD <- as.numeric(as.character(apply(temp.intra[,1:n_individuals],1,function(a){stats::sd(a[!is.na(a)])}))) #Compute inter SD
+    temp.intra$GrandMean <- as.numeric(as.character(apply(temp.intra[,1:n_individuals],1,function(a){mean(a[!is.na(a)])}))) #Compute grand mean
+    temp.intra$DropOut <- as.numeric(as.character(apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){mean(a[!is.na(a)])}))) #Compute gene dropout
+    temp.intra$DropOutStD <- as.numeric(as.character(apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){stats::sd(a[!is.na(a)])})))
+    temp.intra <- temp.intra[ ,(ncol(temp.intra)-3):ncol(temp.intra)]
     main_summary <- as.data.frame(temp.intra)
 
     list(n_individuals,main_summary,intravar)
@@ -167,11 +167,11 @@ compute_data_summaries <- function(expr,
     message("Computing final data summaries ... ")
 
     temp.intra <- as.data.frame(t(do.call("rbind",list(temp.intrameans,temp.intravar,temp.drop))))
-    temp.intra$InterStD <- apply(temp.intra[,1:n_individuals],1,function(a){stats::sd(a[!is.na(a)])}) #Compute inter SD
-    temp.intra$GrandMean <- apply(temp.intra[,1:n_individuals],1,function(a){mean(a[!is.na(a)])}) #Compute grand mean
-    temp.intra$DropOut <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){mean(a[!is.na(a)])}) #Compute gene dropout
-    temp.intra$DropOutStD <- apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){stats::sd(a[!is.na(a)])})
-
+    temp.intra$InterStD <- as.numeric(as.character(apply(temp.intra[,1:n_individuals],1,function(a){stats::sd(a[!is.na(a)])}))) #Compute inter SD
+    temp.intra$GrandMean <- as.numeric(as.character(apply(temp.intra[,1:n_individuals],1,function(a){mean(a[!is.na(a)])}))) #Compute grand mean
+    temp.intra$DropOut <- as.numeric(as.character(apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){mean(a[!is.na(a)])}))) #Compute gene dropout
+    temp.intra$DropOutStD <- as.numeric(as.character(apply(temp.intra[,(1+(n_individuals*2)):(n_individuals*3)],1,function(a){stats::sd(a[!is.na(a)])})))
+    temp.intra <- temp.intra[ ,(ncol(temp.intra)-3):ncol(temp.intra)]
     main_summary <- as.data.frame(temp.intra)
 
     list(n_individuals,main_summary,intravar)
@@ -192,6 +192,9 @@ compute_data_summaries <- function(expr,
 #'  'fitdistrplus' package is required for this function to work. Please install
 #'  it
 #'
+#'@param plot a TRUE/FALSE statement for the output of a plot to observe a
+#'  histogram of grand means
+#'
 #'@param data_summaries an R object that has been output by the package's
 #'  compute_data_summaries function.
 #'
@@ -200,24 +203,45 @@ compute_data_summaries <- function(expr,
 #'  distribution
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'gene_mean_params <- approximate_gene_mean(data_summaries)
+#'gene_mean_params <- approximate_gene_mean(data_summaries)}
 #'
 #'@export
 
-approximate_gene_mean <- function(data_summaries){
+approximate_gene_mean <- function(data_summaries, plot = FALSE){
   if (!requireNamespace("fitdistrplus",quietly = TRUE)){
     stop("The 'fitdistrplus' package is required for this function to work. Please install it",
          call. = FALSE)
+  } else if ((plot == TRUE)) {
+
+    if (!requireNamespace("ggplot2",quietly = TRUE)){
+      stop("The 'ggplot2' package is required for plotting. Please install it",
+           call. = FALSE)
+    } else {
+      data_summaries <- data_summaries[[2]]
+      data_summaries <- data_summaries[which(data_summaries$GrandMean > 0), ]
+      data_summaries <- data_summaries[which(data_summaries$GrandMean < 10000), ]
+
+      message("Plotting distribution of grand means")
+
+      print(ggplot2::ggplot(data_summaries, ggplot2::aes(GrandMean))
+            + ggplot2::geom_histogram(ggplot2::aes(y=..density..),fill="cornflowerblue",color = "black")
+            + ggplot2::ylab("Density"))
+      gene_mean <- fitdistrplus::fitdist(data_summaries$GrandMean, "gamma",method = "mle")
+      gene_mean_shape <- gene_mean$estimate[1]
+      gene_mean_rate <- gene_mean$estimate[2]
+      as.numeric(c(gene_mean_shape,gene_mean_rate))
+    }
+
   } else {
-  data_summaries <- na.omit(data_summaries[[2]])
-  data_summaries <- data_summaries[which(data_summaries$GrandMean > 0), ]
-  data_summaries <- data_summaries[which(data_summaries$GrandMean < 10000), ]
-  gene_mean <- fitdistrplus::fitdist(data_summaries$GrandMean, "gamma",method = "mle")
-  gene_mean_shape <- gene_mean$estimate[1]
-  gene_mean_rate <- gene_mean$estimate[2]
-  as.numeric(c(gene_mean_shape,gene_mean_rate))
+    data_summaries <- data_summaries[[2]]
+    data_summaries <- data_summaries[which(data_summaries$GrandMean > 0), ]
+    data_summaries <- data_summaries[which(data_summaries$GrandMean < 10000), ]
+    gene_mean <- fitdistrplus::fitdist(data_summaries$GrandMean, "gamma",method = "mle")
+    gene_mean_shape <- gene_mean$estimate[1]
+    gene_mean_rate <- gene_mean$estimate[2]
+    as.numeric(c(gene_mean_shape,gene_mean_rate))
   }
 }
 
@@ -245,9 +269,9 @@ approximate_gene_mean <- function(data_summaries){
 #'  distribution
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'dispersion_params <- model_dispersion(data_summaries)
+#'dispersion_params <- model_dispersion(data_summaries)}
 #'
 #'@export
 
@@ -257,18 +281,17 @@ model_dispersion <- function(data_summaries, plot=FALSE){
       stop("The 'ggplot2' package is required for plotting. Please install it",
            call. = FALSE)
     } else {
-      data_summaries <- na.omit(data_summaries[[3]])
+      data_summaries <- data_summaries[[3]]
       data_summaries <- data_summaries[which(data_summaries$Dispersion > 0),]
 
       message("Plotting dispersion")
 
-      suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=IntraMean,y=Dispersion),
+      print(suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=IntraMean,y=sqrt(Dispersion)),
                                        environment = environment()) +
                          ggplot2::geom_point() +
                          ggplot2::stat_smooth(method="glm",
                                               formula = y ~ I(1/x), size = 1,
-                                              method.args = list(family = gaussian(link = "log"))) +
-                         ggplot2::ggsave("Dispersion.pdf"))
+                                              method.args = list(family = gaussian(link = "log")))))
 
       suppressWarnings(temp <- stats::glm(data = data_summaries, Dispersion ~ I(1/IntraMean), family = gaussian(link = "log")))
       suppressWarnings(temp <- summary(temp))
@@ -277,7 +300,7 @@ model_dispersion <- function(data_summaries, plot=FALSE){
       as.numeric(c(disp.beta0,disp.beta1))
     }
   } else {
-    data_summaries <- na.omit(data_summaries[[3]])
+    data_summaries <- data_summaries[[3]]
     data_summaries <- data_summaries[which(data_summaries$Dispersion > 0),]
     temp <- stats::glm(data = data_summaries, Dispersion ~ I(1/IntraMean), family = gaussian(link = "log"))
     suppressWarnings(temp <- summary(temp))
@@ -305,22 +328,44 @@ model_dispersion <- function(data_summaries, plot=FALSE){
 #'@param data_summaries an R object that has been output by the package's
 #'  compute_data_summaries function.
 #'
+#'@param plot a TRUE/FALSE statement for the output of a plot to observe a
+#'  histogram of dropout
 #'
 #'@return A vector of length two, where the first number is the shape of the
 #'  gamma distribution and the second number is the rate of the gamma
 #'  distribution
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'gene_drop_params <- approximate_gene_drop(data_summaries)
+#'gene_drop_params <- approximate_gene_drop(data_summaries)}
 #'
 #'@export
 
-approximate_gene_drop <- function(data_summaries){
+approximate_gene_drop <- function(data_summaries, plot = FALSE){
     if (!requireNamespace("fitdistrplus",quietly = TRUE)){
       stop("The 'fitdistrplus' package is required for this function to work. Please install it",
            call. = FALSE)
+    } else if ((plot == TRUE)) {
+
+      if (!requireNamespace("ggplot2",quietly = TRUE)){
+        stop("The 'ggplot2' package is required for plotting. Please install it",
+             call. = FALSE)
+      } else {
+      data_summaries <- data_summaries[[2]]
+      data_summaries$DropOut <- 1 - data_summaries$DropOut
+      data_summaries <- data_summaries[which(data_summaries$DropOut > 0), ]
+      message("Plotting distribution of dropout")
+
+      print(ggplot2::ggplot(data_summaries, ggplot2::aes(DropOut))
+            + ggplot2::geom_histogram(ggplot2::aes(y=..density..),fill="cornflowerblue",color = "black")
+            + ggplot2::ylab("Density"))
+      drop_gamma <- fitdistrplus::fitdist(data_summaries$DropOut, "gamma",method = "mle")
+      drop_shape <- drop_gamma$estimate[1]
+      drop_rate <- drop_gamma$estimate[2]
+      as.numeric(c(drop_shape,drop_rate))
+      }
+
     } else {
       data_summaries <- data_summaries[[2]]
       data_summaries$DropOut <- 1 - data_summaries$DropOut
@@ -356,9 +401,9 @@ approximate_gene_drop <- function(data_summaries){
 #'  number is the estimate of the intercept or slope for the model.
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'gene_drop_betas <- model_drop_sd(data_summaries)
+#'gene_drop_betas <- model_drop_sd(data_summaries)}
 #'
 #'@export
 
@@ -369,15 +414,15 @@ model_drop_sd <- function(data_summaries, plot=FALSE){
            call. = FALSE)
     } else {
       n_individuals <- data_summaries[[1]]
-      data_summaries <- na.omit(data_summaries[[2]])
+      data_summaries <- data_summaries[[2]]
+
       message("Plotting dropout")
 
-      suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=DropOut,y=DropOutStD),
+      print(suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=DropOut,y=DropOutStD),
                                        environment = environment()) +
                          ggplot2::geom_point() +
                          ggplot2::stat_smooth(method = "glm", formula = y ~ x + I(x**2), fullrange = TRUE) +
-                         ggplot2::ylim(c(0,1)) +
-                         ggplot2::ggsave("Gene_Dropout_StD.pdf"))
+                         ggplot2::ylim(c(0,1))))
 
       suppressWarnings(temp <- stats::glm(data = data_summaries, DropOutStD ~ DropOut + I(DropOut**2)))
       suppressWarnings(temp <- summary(temp))
@@ -388,7 +433,7 @@ model_drop_sd <- function(data_summaries, plot=FALSE){
     }
   } else {
     n_individuals <- data_summaries[[1]]
-    data_summaries <- na.omit(data_summaries[[2]])
+    data_summaries <- data_summaries[[2]]
 
     suppressWarnings(temp <- stats::glm(data = data_summaries, DropOutStD ~ DropOut + I(DropOut**2)))
     suppressWarnings(temp <- summary(temp))
@@ -428,9 +473,9 @@ model_drop_sd <- function(data_summaries, plot=FALSE){
 #'  the estimate of the slope for the log model.
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'inter_betas <- model_inter(data_summaries)
+#'inter_betas <- model_inter(data_summaries)}
 #'
 #'@export
 
@@ -445,12 +490,11 @@ model_inter <- function(data_summaries, plot=FALSE){
 
       message("Plotting inter-individual standard deviation")
 
-      suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=GrandMean,y=InterStD),
+      print(suppressWarnings(ggplot2::ggplot(data_summaries,ggplot2::aes(x=GrandMean,y=InterStD),
                       environment = environment()) +
       ggplot2::geom_point() +
       ggplot2::stat_smooth(method="glm",
-                             formula = y ~ 0 + x, size = 1) +
-      ggplot2::ggsave("Inter_Sample_Heterogeneity.pdf"))
+                             formula = y ~ 0 + x, size = 1)))
 
       suppressWarnings(temp <- stats::glm(data = data_summaries, InterStD ~ 0 + GrandMean))
       suppressWarnings(temp <- summary(temp))

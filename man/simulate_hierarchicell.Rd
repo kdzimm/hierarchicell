@@ -16,8 +16,7 @@ simulate_hierarchicell(
   foldchange = 1,
   decrease_dropout = 0,
   alter_dropout_cases = 0,
-  tSNE_plot = FALSE,
-  plot_name = "tSNE_Simulated_Data"
+  tSNE_plot = FALSE
 )
 }
 \arguments{
@@ -86,10 +85,6 @@ ability to detect differences. Defaults to 0.}
 \item{tSNE_plot}{a TRUE/FALSE statement for the output of a tSNE plot to
 observe the global behavior of your simulated data. Seurat will need to be
 installed for this function to properly work. Defaults to FALSE.}
-
-\item{plot_name}{a character string preferrably containing no spaces for the
-name of the pdf file where the tSNE plot will be stored. Defaults to
-"tSNE_Simulated_Data".}
 }
 \value{
 A data.frame of the simulated data or potentially a pdf of a tSNE plot
@@ -125,8 +120,8 @@ Data should be \strong{only for cells of the specific cell-type} you are
  increase), this should improve dramatically.
 }
 \examples{
-clean_expr_data <- filter_counts()
+\donttest{clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
-simulated_counts <- simulate_hierarchicell(data_summaries)
+simulated_counts <- simulate_hierarchicell(data_summaries)}
 
 }

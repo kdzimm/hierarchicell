@@ -134,12 +134,12 @@ Data should be \strong{only for cells of the specific cell-type} you are
  datasets increase), this should improve dramatically.
 }
 \examples{
-clean_expr_data <- filter_counts()
+\donttest{clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
 error_hierarchicell(data_summaries,
                    n_genes = 100,
                    n_per_group = 4,
                    cells_per_case = 50,
-                   cells_per_control = 50)
+                   cells_per_control = 50)}
 
 }

@@ -30,8 +30,8 @@ Prior to estimating the simulation parameters, it is important to run
  work. Please install it.
 }
 \examples{
-clean_expr_data <- filter_counts()
+\donttest{clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
-gene_drop_betas <- model_drop_sd(data_summaries)
+gene_drop_betas <- model_drop_sd(data_summaries)}
 
 }

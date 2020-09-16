@@ -30,8 +30,8 @@ Prior to estimating the simulation parameters, it is important to run
  it
 }
 \examples{
-clean_expr_data <- filter_counts()
+\donttest{clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
-dispersion_params <- model_dispersion(data_summaries)
+dispersion_params <- model_dispersion(data_summaries)}
 
 }

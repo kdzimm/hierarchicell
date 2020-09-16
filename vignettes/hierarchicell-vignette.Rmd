@@ -1,0 +1,300 @@
+---
+title: "Hierarchicell Vignette"
+author: "Kip D Zimmerman"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{hierarchicell-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# Overview
+
+This vignette is designed to teach users how to use the hierarchicell package to take a real preliminary single-cell RNA-seq dataset, simulate data that recapitulates the most important characteristics of that real data, and use that simulated data to estimate the power with a two-part hurdle mixed model. 
+
+### The importance of hierarchicell
+Single-cell data has a hierarchical structure that is both intuitive and can also be seen empirically. Because of the shared genetic and environmental background that is shared among cells sampled from the same individual, it can be demonstrated that cells (of the same cell type) sampled from the same individual are more correlated than cells sampled from different individuals (Zimmerman et al., 2020). This is important because it means that single-cell data have a hierarchical structure that is rarely accounted for in the statistical analysis of single-cell data and in the study design of single-cell experiments. The manuscript titled "Pseudoreplication bias in single-cell studies; a practical solution" (Zimmerman et al., 2020) demonstrates why failing to account for the intra-individual correlation structure in single-cell RNA-seq studies leads to severely inflated type 1 error rates. However, the majority of single-cell's differential expression methods treat cells as if they were independent. Recently, more researchers have implemented methods that account for the correlation structure and have properly identified the true independent experimental unit (i.e., the individual rather than the cells) in their analyses. However, a vast majority of studies are still treating cells independently or have been designed in a manner (e.g., one independent sample per treatment group with 1000s of cells) that make proper statistical inference impossible. 
+
+Other power calculators and simulation engines that currently exist simulate cells independently. They provide guidance about the number of cells that required to meet a certain power threshold. Here, we provide guidance about the number of independent individuals (as well as the number of cells nested within those individuals) that are needed to reach a certain power threshold. This distinction is extrememly important - thoughtfully assessing how many independent experimental samples (i.e., individuals) are needed for a study is critical to effective study design. 
+
+### Why mixed models?
+When a dataset contains multiple levels (i.e., a hierarchy) the variability can be split into between group variability and within group variability. With such data, units at the highest level (i.e., individuals) are the only truly independent units and treating any of the units of subsequent levels (i.e., cells) as independent is statistically inappropriate. There is a long body of literature that demonstrates that applying statistical inference to replicates that are not statistically independent without properly accounting for their correlation structure will inflate type 1 error rates and lead to spurious results. As the denominator of most statistical tests is a function of the variance, not accounting for the positive correlation among sampling units underestimates the true standard error and leads to false positives.  In addition, treating each replicate as independent inflates the test degrees of freedom, making it easier to falsely reject the null hypothesis. 
+
+Here, we implement mixed models as a means of handling the correlation structure in single-cell RNA-seq data. A different, but commonly applied method that is a valid approach for handling the heirarchical nature of single-cell data, is aggregating the gene expression values from each of the cells within an individual and then computing the analysis on the aggregate values. Doing so, however, reduces the number of data points and is a loss of information which makes this a conservative approach. Overall, it has been demonstrated repeatedly in the literature that mixed models lead to the most accurate results when analyzing hierarchical data. 
+
+Mixed models are implemented as a means of accounting for correlated data by modeling the hierarchical structure of the data by partitioning out the between and within group variability. Mixed models are an extension of typical linear models that allow for both fixed and random effects. A fixed effect is a parameter that does not vary, but random effects are parameters that are themselves random variables. A fixed effect model (think typical linear regression) assumes the data are random variables but the parameters are fixed. With a random effect, however, the data are random variables and the parameters are random variables at the lower level, but fixed at the highest level. For example, if we were to model the test scores of students from six different schools based on some predictor variable, the data would have two levels: schools and students within those schools. The overall mean test scores across all students and all schools is fixed, but the parameter within each school is assumed to follow a random normal distribution with the same mean as the overall mean and some variance.
+
+### Why the two part hurdle model?
+The two-part hurdle model is implemented in a tool called MAST (Finak et al., 2015) and it is used to simultaneously model the continuous (non-zero values) and discrete ("expressed"/"not expressed") components of single-cell data. This is an excellent model for identifying genes that are either:
+
+1. expressed at varying magnitudes (e.g., average expression of 100 vs average expression of 1000)
+2. expressed at different rates (e.g., 30% of cells expressing the gene being tested vs 60% of cells expressing the same gene)
+3. some combination of both
+
+Other models are primarily testing the first hypothesis, but we believe the second hypothesis is just as meaningful and will allow users to capture more genes.
+
+# Installation and R setup
+Before beginning, you will need to install the hierarchicell package
+This can be done by:
+
+* install.packages() from CRAN
+* devtools::install_github() from GitHub (this will download the package in development, so will offer latest developments, but may be unstable)
+
+To load the package simply type "library(hierarchicell)". This will attach the package and all of its related functions.It is important to install and load all of hierarchicell's dependencies as well.
+
+```{r setup}
+## To install from CRAN
+#install.packages("hierarchicell")
+
+## To install from github
+#devtools::install_github("kdzimm/hierarchicell")
+
+## Load dependencies (install where necessary)
+
+#suppressWarnings(suppressPackageStartupMessages({
+#    library(fitdistrplus)
+#    library(ggplot2)
+#    library(MASS)
+#    library(tidyr)
+#    library(gdata)
+#    library(Seurat)
+#    library(data.table)
+#    library(EnvStats)
+#    library(purrr)
+#    library(dplyr)
+#    library(MAST)
+#    library(SummarizedExperiment)
+#    library(BiocGenerics)
+#    library(ROTS)
+#    library(VGAM)
+#    library(geepack)
+#    library(glmmTMB)
+#    library(sva)
+#    library(monocle)
+#    library(stats)
+#    library(methods)
+#    library(grDevices)
+#    library(DESeq2) 
+#}))
+
+## Load R package
+library(hierarchicell)
+```
+
+
+# Load and filter input data
+
+After installing and loading the R-package, the initial steps will 
+be to read in your data and format it properly. Then you have the option of
+filtering your data. By default, the program will only filter out cells and
+genes that contain all zero values. This is the default because, we believe
+that the proportion of zeros in your preliminary dataset is informative for 
+downstream power calculations. If you expect your next set of data to contain
+fewer zeros or to be of higher quality, then filtering at this step may be 
+recommended. 
+
+Data should be only for cells of the specific cell-type you
+are interested in simulating or computing power for. The input data will need 
+to be a data.frame where the unique cell identifier is in column one and the 
+sample identifier is in column two with the remaining columns all being genes.
+Data should be only for cells of the specific cell-type you are interested in 
+simulating or computing power for. Data should also contain as many unique 
+sample identifiers as possible. If you are inputing data that has less than 
+5 unique values for sample identifier (i.e., independent experimental units), 
+then the empirical estimation of the inter-individual heterogeneity is going to 
+be very unstable. Finding such a dataset will be difficult at this time, but, 
+over time (as experiments grow in sample size and the numbers of publically 
+available single-cell RNAseq datasets increase), this should improve dramatically.
+
+If you do not have a preliminary dataset you would like to use, running the 
+filter_counts function without specifying any options ("filter_counts()") will
+load a default dataset of pancreatic alpha cells. This a reasonable starting 
+place for researchers looking to simply get an idea of power for their study. 
+
+```{r}
+## Run hierarchicells filter_counts function to filter and prepare for next steps
+
+gene_counts_filtered <- hierarchicell::filter_counts()
+gene_counts_filtered[1:5,1:5]
+```
+
+# Estimate and plot various parameters
+
+After running the filter_counts function and ensuring your data is in the 
+proper format, the next step involves estimation of the simulation parameters. 
+The functions estimate the empirical distributions for dropout rate, global gene 
+means, and they model the hierarchical variance structure of the input data. The
+default for these functions assumes the data are normalized somehow (i.e., "TPM",
+"RPM","FPKM"), however, raw data can be input as well. It will just need to be 
+specified (type = "Raw").
+
+Here, we will run the global compute_data_summaries function first. This is the 
+only function you will need to run to continue on with next steps. In the latter
+steps we will use the individual functions within the compute_data_summaries 
+function to plot distributions and visualize how well the program is modeling
+the behavior of the input data. This is recommended for you to ensure nothing
+extremely concerning is happening with your data. 
+
+NOTE: With some data types, the intra-individual variance is (more often than not)
+smaller than the intra-individual mean. This leads to negative dispersion estimates
+which end up being disregarded. We are working on developing more advanced simulation
+methods that take this into account and use a poisson or gaussian instead of a 
+negative binomial where these scenarios exist. 
+
+
+```{r}
+
+## Compute data summaries - all-in-one step
+
+data_summ <- hierarchicell::compute_data_summaries(gene_counts_filtered, type = "Norm")
+
+## Example with "raw" counts
+# data_summ <- hierarchicell::compute_data_summaries(gene_counts_filtered, type = "Raw")
+
+## Examine how well the program is modeling the behavior of the input data
+
+## Histogram of the gene means
+
+approximate_gene_mean(data_summ, plot = TRUE)
+
+## Model dispersion as a function of the grand mean
+
+model_dispersion(data_summ, plot = TRUE)
+
+## Model inter-individual variance as a function of the grand mean
+
+model_inter(data_summ, plot = TRUE)
+
+## Histogram of mean dropout
+
+approximate_gene_drop(data_summ, plot = TRUE)
+
+## Model dropout variance as a function of mean dropout
+
+model_drop_sd(data_summ, plot = TRUE)
+
+```
+
+# Simulate data and visualize
+
+The following function is only used if you are interested in simulating data, without using 
+the data to estimate type 1 error or power. It is also useful if you want to visualize your 
+simulated data with a tSNE plot. The main component to check for is a hierarchical structure 
+of some degree (i.e.,cells from the same individual are clustering together more closely to 
+one another). Depending on the cell type, however, the degree of intra-individual correlation 
+will vary greatly, however, so an initial tSNE plot of the real data might be worth
+observing as well. 
+
+```{r}
+
+## Simulate your data and store it
+
+simulated_macroph <- simulate_hierarchicell(data_summ, 
+                                            n_genes = 100, #100 genes
+                                            n_per_group = 5, #5 individuals per group
+                                            cells_per_control = 50, #50 cells per control
+                                            cells_per_case = 50, #50 cells per case
+                                            ncells_variation_type = "Poisson", #Cells per individual
+                                            foldchange = 2) #Fold change
+
+## Simulate your data and visualize with a tSNE plot
+
+simulate_hierarchicell(data_summ, 
+                       n_genes = 1000,
+                       n_per_group = 5,
+                       cells_per_control = 50,
+                       cells_per_case = 50,
+                       ncells_variation_type = "Poisson",
+                       foldchange = 2,
+                       tSNE_plot = TRUE)
+
+## Simulate continuous outcomes and visualize with a tSNE plot
+
+simulate_hierarchicell_continuous(data_summ,
+                                  n_genes = 1000,
+                                  n_individuals = 10,
+                                  cells_per_individual = 50,
+                                  ncells_variation_type = "Poisson",
+                                  rho = 1,
+                                  continuous_mean = 0,
+                                  continuous_sd = 1,
+                                  decrease_dropout = 0,
+                                  tSNE_plot = TRUE)
+
+```
+
+# Estimate power for various scenarios
+
+Once the other necessary steps have been completed (minimally, 1. filter_counts 2. compute_data_summaries), the power_hierarchicell function can be used to estimate power for a variety of scenarios. This function can take some time, because it is analyzing each gene in the simulated data with linear mixed effects model. To save time, one can apply the pseudobulk methods from the type 1 error calculator (error_hierarchicell(method = "Pseudobulk_mean")) and still obtain a reasonable approximation of power for a given fold change. However, if the numbers of cells per individual (ncells_variation_type) are modeled with a negative binomial where there is extreme imbalance this method will be underpowered.
+
+```{r}
+## Estimate power for 10 individuals per treatment group with a fold-change of 2 (aggregation methods)
+## NOTE: This will throw an error for using a fold-change not equal to 1, this is fine, because you are not using the tool in this instance to compute type 1 error.
+
+error_hierarchicell(data_summ,
+                    method = "Pseudobulk_mean",
+                    n_genes = 1000,
+                    n_per_group = 10,
+                    cells_per_case = 50,
+                    cells_per_control = 50,
+                    ncells_variation_type = "Poisson",
+                    pval = 0.05,
+                    foldchange = 2)
+
+
+## Estimate power for 10 individuals per treatment group with a fold-change of 2 (mixed models)
+
+error_hierarchicell(data_summ,
+                    method = "MAST_RE",
+                    n_genes = 1000,
+                    n_per_group = 10,
+                    cells_per_case = 50,
+                    cells_per_control = 50,
+                    ncells_variation_type = "Poisson",
+                    pval = 0.05,
+                    foldchange = 1)
+
+## Or:
+
+power_hierarchicell(data_summ,
+                    n_genes = 1000,
+                    n_per_group = 10,
+                    cells_per_case = 50,
+                    cells_per_control = 50,
+                    ncells_variation_type = "Poisson",
+                    pval = 0.05,
+                    foldchange = 2)
+
+## Estimate power for 40 individuals with a continuous outcome (mean = 10, sd = 4) that is highly correlated to gene expression (rho = 0.99)
+
+power_hierarchicell_continuous(data_summ,
+                               n_genes = 1000,
+                               n_individuals = 20,
+                               cells_per_individual = 50,
+                               ncells_variation_type = "Poisson",
+                               rho = 0.99,
+                               continuous_mean = 10,
+                               continuous_sd = 4)
+
+## Estimate power for 40 individuals with a continuous outcome that is moderately correlated to gene expression (rho = 0.6)
+
+power_hierarchicell_continuous(data_summ,
+                               n_genes = 1000,
+                               n_individuals = 20,
+                               cells_per_individual = 50,
+                               ncells_variation_type = "Poisson",
+                               rho = 0.6,
+                               continuous_mean = 10,
+                               continuous_sd = 4)
+
+
+
+```
+

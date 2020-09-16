@@ -147,13 +147,13 @@ NULL
 #'  among measures from cells within an individual.
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
 #'error_hierarchicell(data_summaries,
 #'                    n_genes = 100,
 #'                    n_per_group = 4,
 #'                    cells_per_case = 50,
-#'                    cells_per_control = 50)
+#'                    cells_per_control = 50)}
 #'
 #'@export
 
@@ -1046,7 +1046,7 @@ error_hierarchicell <- function(data_summaries,
       coldata$Status <- ifelse(coldata$Status == "Control",0,1)
       coldata$DonorID <- as.factor(coldata$DonorID)
       genecounts <- genecounts[,rownames(coldata)]
-      results <- suppressMessages(ROTS::ROTS(data = genecounts, groups = coldata$Status, B = 1000, K = 500, seed = 4119))
+      results <- suppressMessages(ROTS::ROTS(data = genecounts, groups = coldata$Status, B = 1000, K = 500))
       results <- suppressMessages(ROTS::summary.ROTS(results, num.genes=nrow(genecounts)))
       results <- as.data.frame(results)
       results <- stats::na.omit(results)

@@ -120,8 +120,8 @@ Data should be \strong{only for cells of the specific cell-type} you are
  increase), this should improve dramatically.
 }
 \examples{
-clean_expr_data <- filter_counts()
+\donttest{clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
-power_hierarchicell(data_summaries, n_genes = 100, n_per_group = 2)
+power_hierarchicell(data_summaries, n_genes = 100, n_per_group = 2)}
 
 }

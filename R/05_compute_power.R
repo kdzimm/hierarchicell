@@ -131,9 +131,9 @@ NULL
 #'  from cells within an individual.
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
-#'power_hierarchicell(data_summaries, n_genes = 100, n_per_group = 2)
+#'power_hierarchicell(data_summaries, n_genes = 100, n_per_group = 2)}
 #'
 #'@export
 
@@ -534,12 +534,12 @@ power_hierarchicell <- function(data_summaries,
 #'  from cells within an individual.
 #'
 #'@examples
-#'clean_expr_data <- filter_counts()
+#'\donttest{clean_expr_data <- filter_counts()
 #'data_summaries <- compute_data_summaries(clean_expr_data)
 #'power_hierarchicell_continuous(data_summaries,
 #'                               n_genes = 100,
 #'                               n_individuals = 2,
-#'                               cells_per_individual = 50)
+#'                               cells_per_individual = 50)}
 #'
 #'@export
 

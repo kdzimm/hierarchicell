@@ -4,11 +4,14 @@
 \alias{approximate_gene_drop}
 \title{Approximate Gene Dropout as a gamma}
 \usage{
-approximate_gene_drop(data_summaries)
+approximate_gene_drop(data_summaries, plot = FALSE)
 }
 \arguments{
 \item{data_summaries}{an R object that has been output by the package's
 compute_data_summaries function.}
+
+\item{plot}{a TRUE/FALSE statement for the output of a plot to observe a
+histogram of dropout}
 }
 \value{
 A vector of length two, where the first number is the shape of the
@@ -27,8 +30,8 @@ Prior to estimating the simulation parameters, it is important to run
  work. Please install it.
 }
 \examples{
-clean_expr_data <- filter_counts()
+\donttest{clean_expr_data <- filter_counts()
 data_summaries <- compute_data_summaries(clean_expr_data)
-gene_drop_params <- approximate_gene_drop(data_summaries)
+gene_drop_params <- approximate_gene_drop(data_summaries)}
 
 }
