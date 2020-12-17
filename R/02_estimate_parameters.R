@@ -226,7 +226,7 @@ approximate_gene_mean <- function(data_summaries, plot = FALSE){
       message("Plotting distribution of grand means")
 
       print(ggplot2::ggplot(data_summaries, ggplot2::aes(GrandMean))
-            + ggplot2::geom_histogram(ggplot2::aes(y=..density..),fill="cornflowerblue",color = "black")
+            + ggplot2::geom_histogram(stat="density",fill="cornflowerblue",color = "black")
             + ggplot2::ylab("Density"))
       gene_mean <- fitdistrplus::fitdist(data_summaries$GrandMean, "gamma",method = "mle")
       gene_mean_shape <- gene_mean$estimate[1]
@@ -358,7 +358,7 @@ approximate_gene_drop <- function(data_summaries, plot = FALSE){
       message("Plotting distribution of dropout")
 
       print(ggplot2::ggplot(data_summaries, ggplot2::aes(DropOut))
-            + ggplot2::geom_histogram(ggplot2::aes(y=..density..),fill="cornflowerblue",color = "black")
+            + ggplot2::geom_histogram(stat = "density",fill="cornflowerblue",color = "black")
             + ggplot2::ylab("Density"))
       drop_gamma <- fitdistrplus::fitdist(data_summaries$DropOut, "gamma",method = "mle")
       drop_shape <- drop_gamma$estimate[1]
