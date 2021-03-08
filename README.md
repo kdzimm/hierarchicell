@@ -50,22 +50,9 @@ devtools::install_github("kdzimm/hierarchicell")
 ```{r}
 
 ### Load and filter a cell-type specific scRNA-seq datset of interest
-# (Here, we are just making up a dataset)
+# (Here, we are just loading the default dataset)
 
-n_genes <- 10
-n_cells <- 10
-
-make_data <- function(x){
-mu_random <- round(rgamma(n=1, shape=1, rate=0.001),0)
-size_random <- runif(n=1, min=0, max=3)
-rnbinom(n_cells, size=size_random, mu=mu_random)
-}
-
-expr_dat <- as.data.frame(replicate(n_genes,make_data()))
-expr_dat$CellID <- paste0("Cell",1:n_cells)
-expr_dat$IND <- "IND1"
-expr_dat <- expr_dat[,c(11,12,1:10)]
-clean_expr_data <- filter_counts(expr_dat)
+clean_expr_data <- filter_counts()
 
 ### Estimate parameters from the simulated data
 
