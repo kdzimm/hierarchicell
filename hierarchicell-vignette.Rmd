@@ -196,7 +196,7 @@ observing as well.
 
 ## Simulate your data and store it
 
-simulated_macroph <- simulate_hierarchicell(data_summ, 
+sim_dat1 <- simulated_macroph <- simulate_hierarchicell(data_summ, 
                                             n_genes = 100, #100 genes
                                             n_per_group = 5, #5 individuals per group
                                             cells_per_control = 50, #50 cells per control
@@ -206,7 +206,7 @@ simulated_macroph <- simulate_hierarchicell(data_summ,
 
 ## Simulate your data and visualize with a tSNE plot
 
-simulate_hierarchicell(data_summ, 
+sim_dat2 <- simulate_hierarchicell(data_summ, 
                        n_genes = 1000,
                        n_per_group = 5,
                        cells_per_control = 50,
@@ -217,7 +217,7 @@ simulate_hierarchicell(data_summ,
 
 ## Simulate continuous outcomes and visualize with a tSNE plot
 
-simulate_hierarchicell_continuous(data_summ,
+sim_dat3 <- simulate_hierarchicell_continuous(data_summ,
                                   n_genes = 1000,
                                   n_individuals = 10,
                                   cells_per_individual = 50,

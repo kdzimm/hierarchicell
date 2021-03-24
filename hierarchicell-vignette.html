@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Kip D Zimmerman" />
+
+<meta name="date" content="2021-03-22" />
+
+<title>Hierarchicell Vignette</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Hierarchicell Vignette</h1>
+<h4 class="author">Kip D Zimmerman</h4>
+<h4 class="date">2021-03-22</h4>
+
+
+
+<div id="overview" class="section level1">
+<h1>Overview</h1>
+<p>This vignette is designed to teach users how to use the hierarchicell package to take a real preliminary single-cell RNA-seq dataset, simulate data that recapitulates the most important characteristics of that real data, and use that simulated data to estimate the power with a two-part hurdle mixed model.</p>
+<div id="the-importance-of-hierarchicell" class="section level3">
+<h3>The importance of hierarchicell</h3>
+<p>Single-cell data has a hierarchical structure that is both intuitive and can also be seen empirically. Because of the shared genetic and environmental background that is shared among cells sampled from the same individual, it can be demonstrated that cells (of the same cell type) sampled from the same individual are more correlated than cells sampled from different individuals (Zimmerman et al., 2020). This is important because it means that single-cell data have a hierarchical structure that is rarely accounted for in the statistical analysis of single-cell data and in the study design of single-cell experiments. The manuscript titled “Pseudoreplication bias in single-cell studies; a practical solution” (Zimmerman et al., 2020) demonstrates why failing to account for the intra-individual correlation structure in single-cell RNA-seq studies leads to severely inflated type 1 error rates. However, the majority of single-cell’s differential expression methods treat cells as if they were independent. Recently, more researchers have implemented methods that account for the correlation structure and have properly identified the true independent experimental unit (i.e., the individual rather than the cells) in their analyses. However, a vast majority of studies are still treating cells independently or have been designed in a manner (e.g., one independent sample per treatment group with 1000s of cells) that make proper statistical inference impossible.</p>
+<p>Other power calculators and simulation engines that currently exist simulate cells independently. They provide guidance about the number of cells that required to meet a certain power threshold. Here, we provide guidance about the number of independent individuals (as well as the number of cells nested within those individuals) that are needed to reach a certain power threshold. This distinction is extrememly important - thoughtfully assessing how many independent experimental samples (i.e., individuals) are needed for a study is critical to effective study design.</p>
+</div>
+<div id="why-mixed-models" class="section level3">
+<h3>Why mixed models?</h3>
+<p>When a dataset contains multiple levels (i.e., a hierarchy) the variability can be split into between group variability and within group variability. With such data, units at the highest level (i.e., individuals) are the only truly independent units and treating any of the units of subsequent levels (i.e., cells) as independent is statistically inappropriate. There is a long body of literature that demonstrates that applying statistical inference to replicates that are not statistically independent without properly accounting for their correlation structure will inflate type 1 error rates and lead to spurious results. As the denominator of most statistical tests is a function of the variance, not accounting for the positive correlation among sampling units underestimates the true standard error and leads to false positives. In addition, treating each replicate as independent inflates the test degrees of freedom, making it easier to falsely reject the null hypothesis.</p>
+<p>Here, we implement mixed models as a means of handling the correlation structure in single-cell RNA-seq data. A different, but commonly applied method that is a valid approach for handling the heirarchical nature of single-cell data, is aggregating the gene expression values from each of the cells within an individual and then computing the analysis on the aggregate values. Doing so, however, reduces the number of data points and is a loss of information which makes this a conservative approach. Overall, it has been demonstrated repeatedly in the literature that mixed models lead to the most accurate results when analyzing hierarchical data.</p>
+<p>Mixed models are implemented as a means of accounting for correlated data by modeling the hierarchical structure of the data by partitioning out the between and within group variability. Mixed models are an extension of typical linear models that allow for both fixed and random effects. A fixed effect is a parameter that does not vary, but random effects are parameters that are themselves random variables. A fixed effect model (think typical linear regression) assumes the data are random variables but the parameters are fixed. With a random effect, however, the data are random variables and the parameters are random variables at the lower level, but fixed at the highest level. For example, if we were to model the test scores of students from six different schools based on some predictor variable, the data would have two levels: schools and students within those schools. The overall mean test scores across all students and all schools is fixed, but the parameter within each school is assumed to follow a random normal distribution with the same mean as the overall mean and some variance.</p>
+</div>
+<div id="why-the-two-part-hurdle-model" class="section level3">
+<h3>Why the two part hurdle model?</h3>
+<p>The two-part hurdle model is implemented in a tool called MAST (Finak et al., 2015) and it is used to simultaneously model the continuous (non-zero values) and discrete (“expressed”/“not expressed”) components of single-cell data. This is an excellent model for identifying genes that are either:</p>
+<ol style="list-style-type: decimal">
+<li>expressed at varying magnitudes (e.g., average expression of 100 vs average expression of 1000)</li>
+<li>expressed at different rates (e.g., 30% of cells expressing the gene being tested vs 60% of cells expressing the same gene)</li>
+<li>some combination of both</li>
+</ol>
+<p>Other models are primarily testing the first hypothesis, but we believe the second hypothesis is just as meaningful and will allow users to capture more genes.</p>
+</div>
+</div>
+<div id="installation-and-r-setup" class="section level1">
+<h1>Installation and R setup</h1>
+<p>Before beginning, you will need to install the hierarchicell package This can be done by:</p>
+<ul>
+<li>install.packages() from CRAN</li>
+<li>devtools::install_github() from GitHub (this will download the package in development, so will offer latest developments, but may be unstable)</li>
+</ul>
+<p>To load the package simply type “library(hierarchicell)”. This will attach the package and all of its related functions.It is important to install and load all of hierarchicell’s dependencies as well.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## To install from CRAN</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages(&quot;hierarchicell&quot;)</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="do">## To install from github</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#devtools::install_github(&quot;kdzimm/hierarchicell&quot;)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="do">## Load dependencies (install where necessary)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#suppressWarnings(suppressPackageStartupMessages({</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(fitdistrplus)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(ggplot2)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(MASS)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(tidyr)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(gdata)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(Seurat)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(data.table)</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(EnvStats)</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(purrr)</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(dplyr)</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(MAST)</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(SummarizedExperiment)</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(BiocGenerics)</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(ROTS)</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(VGAM)</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(geepack)</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(glmmTMB)</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(sva)</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(monocle)</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(stats)</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(methods)</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(grDevices)</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">#    library(DESeq2) </span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co">#}))</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="do">## Load R package</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hierarchicell)</span></code></pre></div>
+</div>
+<div id="load-and-filter-input-data" class="section level1">
+<h1>Load and filter input data</h1>
+<p>After installing and loading the R-package, the initial steps will be to read in your data and format it properly. Then you have the option of filtering your data. By default, the program will only filter out cells and genes that contain all zero values. This is the default because, we believe that the proportion of zeros in your preliminary dataset is informative for downstream power calculations. If you expect your next set of data to contain fewer zeros or to be of higher quality, then filtering at this step may be recommended.</p>
+<p>Data should be only for cells of the specific cell-type you are interested in simulating or computing power for. The input data will need to be a data.frame where the unique cell identifier is in column one and the sample identifier is in column two with the remaining columns all being genes. Data should be only for cells of the specific cell-type you are interested in simulating or computing power for. Data should also contain as many unique sample identifiers as possible. If you are inputing data that has less than 5 unique values for sample identifier (i.e., independent experimental units), then the empirical estimation of the inter-individual heterogeneity is going to be very unstable. Finding such a dataset will be difficult at this time, but, over time (as experiments grow in sample size and the numbers of publically available single-cell RNAseq datasets increase), this should improve dramatically.</p>
+<p>If you do not have a preliminary dataset you would like to use, running the filter_counts function without specifying any options (“filter_counts()”) will load a default dataset of pancreatic alpha cells. This a reasonable starting place for researchers looking to simply get an idea of power for their study.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Run hierarchicells filter_counts function to filter and prepare for next steps</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>gene_counts_filtered <span class="ot">&lt;-</span> hierarchicell<span class="sc">::</span><span class="fu">filter_counts</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Filtering default dataset</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Genes and cells have been filtered, ready for estimating parameters</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>gene_counts_filtered[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        CellID IndividualID Gene1 Gene2 Gene3</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  ERR1630015           H1     0     0     0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6  ERR1630021           H1     0     0     0</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 ERR1630028           H1     0     0     0</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 ERR1630029           H1     0     0     0</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 ERR1630030           H1     0     0     0</span></span></code></pre></div>
+</div>
+<div id="estimate-and-plot-various-parameters" class="section level1">
+<h1>Estimate and plot various parameters</h1>
+<p>After running the filter_counts function and ensuring your data is in the proper format, the next step involves estimation of the simulation parameters. The functions estimate the empirical distributions for dropout rate, global gene means, and they model the hierarchical variance structure of the input data. The default for these functions assumes the data are normalized somehow (i.e., “TPM”, “RPM”,“FPKM”), however, raw data can be input as well. It will just need to be specified (type = “Raw”).</p>
+<p>Here, we will run the global compute_data_summaries function first. This is the only function you will need to run to continue on with next steps. In the latter steps we will use the individual functions within the compute_data_summaries function to plot distributions and visualize how well the program is modeling the behavior of the input data. This is recommended for you to ensure nothing extremely concerning is happening with your data.</p>
+<p>NOTE: With some data types, the intra-individual variance is (more often than not) smaller than the intra-individual mean. This leads to negative dispersion estimates which end up being disregarded. We are working on developing more advanced simulation methods that take this into account and use a poisson or gaussian instead of a negative binomial where these scenarios exist.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Compute data summaries - all-in-one step</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>data_summ <span class="ot">&lt;-</span> hierarchicell<span class="sc">::</span><span class="fu">compute_data_summaries</span>(gene_counts_filtered, <span class="at">type =</span> <span class="st">&quot;Norm&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing sample means, dropout rates, and dispersion ...</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing final data summaries ...</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Example with &quot;raw&quot; counts</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># data_summ &lt;- hierarchicell::compute_data_summaries(gene_counts_filtered, type = &quot;Raw&quot;)</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="do">## Examine how well the program is modeling the behavior of the input data</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Histogram of the gene means</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">approximate_gene_mean</span>(data_summ, <span class="at">plot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Plotting distribution of grand means</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: Ignoring unknown parameters: binwidth, bins, pad</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; [1] 0.70531567 0.01832447
+
+## Model dispersion as a function of the grand mean
+
+model_dispersion(data_summ, plot = TRUE)
+#&gt; Plotting dispersion</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; [1] 1.054395 1.610248
+
+## Model inter-individual variance as a function of the grand mean
+
+model_inter(data_summ, plot = TRUE)
+#&gt; Plotting inter-individual standard deviation</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; [1] 0.1727052
+
+## Histogram of mean dropout
+
+approximate_gene_drop(data_summ, plot = TRUE)
+#&gt; Plotting distribution of dropout
+#&gt; Warning: Ignoring unknown parameters: binwidth, bins, pad</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; [1] 0.7502302 1.9042279
+
+## Model dropout variance as a function of mean dropout
+
+model_drop_sd(data_summ, plot = TRUE)
+#&gt; Plotting dropout</code></pre>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt; [1]  0.03029633  0.69215768 -0.71778302</code></pre>
+</div>
+<div id="simulate-data-and-visualize" class="section level1">
+<h1>Simulate data and visualize</h1>
+<p>The following function is only used if you are interested in simulating data, without using the data to estimate type 1 error or power. It is also useful if you want to visualize your simulated data with a tSNE plot. The main component to check for is a hierarchical structure of some degree (i.e.,cells from the same individual are clustering together more closely to one another). Depending on the cell type, however, the degree of intra-individual correlation will vary greatly, however, so an initial tSNE plot of the real data might be worth observing as well.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Simulate your data and store it</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>sim_dat1 <span class="ot">&lt;-</span> simulated_macroph <span class="ot">&lt;-</span> <span class="fu">simulate_hierarchicell</span>(data_summ, </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">n_genes =</span> <span class="dv">100</span>, <span class="co">#100 genes</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">n_per_group =</span> <span class="dv">5</span>, <span class="co">#5 individuals per group</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">cells_per_control =</span> <span class="dv">50</span>, <span class="co">#50 cells per control</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">cells_per_case =</span> <span class="dv">50</span>, <span class="co">#50 cells per case</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>, <span class="co">#Cells per individual</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">foldchange =</span> <span class="dv">2</span>) <span class="co">#Fold change</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing simulation parameters ...</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Distribution of grand means is a gamma</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; with shape: 0.71 and rate: 0.02</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Distribution for gene-wise dropout is a gamma </span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  with shape: 0.75 and rate: 1.9</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for dropout SD is:</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DropoutStD = 0.03 + 0.69*DropOut + -0.72*(DropOut**2)</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for inter-individual SD is:</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; InterStDev = 0 + 0.17*GrandMean)</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for dispersion is:</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  exp(1.05 + 1.61/IntraMean)</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulating cells ...</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulating expression values ...</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; All done!</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="do">## Simulate your data and visualize with a tSNE plot</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>sim_dat2 <span class="ot">&lt;-</span> <span class="fu">simulate_hierarchicell</span>(data_summ, </span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n_genes =</span> <span class="dv">1000</span>,</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n_per_group =</span> <span class="dv">5</span>,</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cells_per_control =</span> <span class="dv">50</span>,</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                       <span class="at">cells_per_case =</span> <span class="dv">50</span>,</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>                       <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>,</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>                       <span class="at">foldchange =</span> <span class="dv">2</span>,</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>                       <span class="at">tSNE_plot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing simulation parameters ...</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Distribution of grand means is a gamma</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; with shape: 0.71 and rate: 0.02</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Distribution for gene-wise dropout is a gamma </span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  with shape: 0.75 and rate: 1.9</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for dropout SD is:</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DropoutStD = 0.03 + 0.69*DropOut + -0.72*(DropOut**2)</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for inter-individual SD is:</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; InterStDev = 0 + 0.17*GrandMean)</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for dispersion is:</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  exp(1.05 + 1.61/IntraMean)</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulating cells ...</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulating expression values ...</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Generating tSNE plot ...</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: The following arguments are not used: do.plot</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Centering and scaling data matrix</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 1 </span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene358, Gene54, Gene803, Gene829, Gene816, Gene819, Gene738, Gene991, Gene457, Gene271 </span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene922, Gene439, Gene689, Gene752, Gene28, Gene15, Gene825, Gene887, Gene914, Gene430 </span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene30, Gene645, Gene22, Gene379, Gene204, Gene696, Gene886, Gene138, Gene147, Gene648 </span></span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene279, Gene8, Gene510, Gene777, Gene491, Gene497, Gene144, Gene937, Gene365, Gene791 </span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene298, Gene729, Gene960, Gene299, Gene547, Gene418, Gene714, Gene688, Gene764, Gene86 </span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene146, Gene617, Gene602, Gene832, Gene415, Gene976, Gene254, Gene373, Gene482, Gene824 </span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 2 </span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene506, Gene564, Gene792, Gene455, Gene297, Gene854, Gene976, Gene523, Gene717, Gene647 </span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene597, Gene387, Gene269, Gene602, Gene679, Gene415, Gene9, Gene842, Gene837, Gene315 </span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene209, Gene539, Gene711, Gene907, Gene246, Gene151, Gene372, Gene62, Gene867, Gene223 </span></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene505, Gene140, Gene354, Gene210, Gene495, Gene707, Gene77, Gene772, Gene890, Gene747 </span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene763, Gene181, Gene345, Gene660, Gene666, Gene63, Gene359, Gene312, Gene247, Gene89 </span></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene463, Gene744, Gene672, Gene361, Gene450, Gene425, Gene52, Gene500, Gene876, Gene310 </span></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 3 </span></span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene703, Gene456, Gene172, Gene969, Gene677, Gene732, Gene670, Gene859, Gene697, Gene103 </span></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene466, Gene260, Gene20, Gene561, Gene68, Gene852, Gene403, Gene304, Gene973, Gene900 </span></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene815, Gene514, Gene741, Gene834, Gene438, Gene258, Gene78, Gene748, Gene752, Gene5 </span></span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene420, Gene19, Gene22, Gene710, Gene807, Gene122, Gene315, Gene610, Gene598, Gene730 </span></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene901, Gene186, Gene62, Gene209, Gene346, Gene1000, Gene140, Gene597, Gene789, Gene220 </span></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene82, Gene504, Gene480, Gene662, Gene666, Gene144, Gene986, Gene754, Gene559, Gene906 </span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 4 </span></span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene332, Gene187, Gene781, Gene923, Gene531, Gene814, Gene203, Gene599, Gene419, Gene410 </span></span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene482, Gene5, Gene447, Gene96, Gene709, Gene35, Gene360, Gene286, Gene301, Gene376 </span></span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene567, Gene313, Gene686, Gene695, Gene863, Gene969, Gene579, Gene848, Gene177, Gene291 </span></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene437, Gene445, Gene981, Gene265, Gene349, Gene711, Gene334, Gene729, Gene551, Gene221 </span></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene540, Gene13, Gene835, Gene212, Gene279, Gene357, Gene345, Gene372, Gene19, Gene613 </span></span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene153, Gene810, Gene631, Gene824, Gene138, Gene745, Gene192, Gene304, Gene61, Gene640 </span></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 5 </span></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene540, Gene146, Gene631, Gene770, Gene993, Gene617, Gene748, Gene245, Gene201, Gene565 </span></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene807, Gene936, Gene544, Gene884, Gene700, Gene229, Gene91, Gene454, Gene925, Gene467 </span></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene503, Gene355, Gene606, Gene628, Gene722, Gene421, Gene975, Gene708, Gene78, Gene130 </span></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene158, Gene627, Gene706, Gene834, Gene871, Gene1, Gene953, Gene150, Gene502, Gene591 </span></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene636, Gene284, Gene465, Gene843, Gene876, Gene730, Gene373, Gene798, Gene316, Gene345 </span></span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene982, Gene154, Gene498, Gene22, Gene7, Gene551, Gene278, Gene420, Gene601, Gene766</span></span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing nearest neighbor graph</span></span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing SNN</span></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck</span></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of nodes: 497</span></span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of edges: 22733</span></span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running Louvain algorithm...</span></span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Maximum modularity in 10 random starts: 0.5956</span></span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of communities: 2</span></span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Elapsed time: 0 seconds</span></span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; All done!</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Simulate continuous outcomes and visualize with a tSNE plot</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>sim_dat3 <span class="ot">&lt;-</span> <span class="fu">simulate_hierarchicell_continuous</span>(data_summ,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">n_genes =</span> <span class="dv">1000</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">n_individuals =</span> <span class="dv">10</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">cells_per_individual =</span> <span class="dv">50</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">rho =</span> <span class="dv">1</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">continuous_mean =</span> <span class="dv">0</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">continuous_sd =</span> <span class="dv">1</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">decrease_dropout =</span> <span class="dv">0</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">tSNE_plot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing simulation parameters ...</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Distribution of grand means is a gamma</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; with shape: 0.71 and rate: 0.02</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Distribution for gene-wise dropout is a gamma </span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  with shape: 0.75 and rate: 1.9</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for dropout SD is:</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; DropoutStD = 0.03 + 0.69*DropOut + -0.72*(DropOut**2)</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for inter-individual SD is:</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; InterStDev = 0 + 0.17*GrandMean)</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Function for dispersion is:</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  exp(1.05 + 1.61/IntraMean)</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulating cells ...</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Simulating expression values ...</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Generating tSNE plot ...</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: The following arguments are not used: do.plot</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Centering and scaling data matrix</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 1 </span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene898, Gene964, Gene277, Gene322, Gene659, Gene300, Gene88, Gene255, Gene553, Gene337 </span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene779, Gene137, Gene593, Gene530, Gene453, Gene78, Gene582, Gene808, Gene595, Gene325 </span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene482, Gene812, Gene421, Gene190, Gene996, Gene525, Gene960, Gene192, Gene451, Gene672 </span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene756, Gene739, Gene131, Gene275, Gene765, Gene543, Gene680, Gene186, Gene273, Gene712 </span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene458, Gene951, Gene43, Gene731, Gene321, Gene10, Gene560, Gene386, Gene251, Gene597 </span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene714, Gene741, Gene318, Gene185, Gene977, Gene454, Gene340, Gene489, Gene452, Gene80 </span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 2 </span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene653, Gene500, Gene61, Gene766, Gene50, Gene585, Gene991, Gene174, Gene913, Gene956 </span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene790, Gene168, Gene899, Gene432, Gene76, Gene315, Gene576, Gene355, Gene70, Gene992 </span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene799, Gene294, Gene704, Gene358, Gene313, Gene841, Gene345, Gene521, Gene136, Gene577 </span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene530, Gene405, Gene845, Gene949, Gene931, Gene8, Gene801, Gene773, Gene130, Gene389 </span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene63, Gene325, Gene544, Gene929, Gene462, Gene43, Gene332, Gene810, Gene625, Gene919 </span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene464, Gene669, Gene479, Gene570, Gene127, Gene375, Gene514, Gene4, Gene889, Gene244 </span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 3 </span></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene949, Gene489, Gene159, Gene77, Gene308, Gene729, Gene311, Gene990, Gene693, Gene580 </span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene176, Gene824, Gene927, Gene193, Gene278, Gene108, Gene620, Gene61, Gene409, Gene985 </span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene181, Gene112, Gene484, Gene303, Gene676, Gene128, Gene784, Gene782, Gene948, Gene634 </span></span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene854, Gene687, Gene734, Gene477, Gene619, Gene295, Gene73, Gene686, Gene199, Gene879 </span></span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene265, Gene892, Gene905, Gene91, Gene210, Gene399, Gene138, Gene721, Gene41, Gene12 </span></span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene561, Gene63, Gene820, Gene804, Gene834, Gene770, Gene102, Gene7, Gene970, Gene612 </span></span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 4 </span></span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene685, Gene100, Gene450, Gene51, Gene918, Gene243, Gene461, Gene882, Gene935, Gene97 </span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene651, Gene622, Gene699, Gene400, Gene672, Gene354, Gene363, Gene665, Gene119, Gene258 </span></span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene313, Gene124, Gene301, Gene222, Gene909, Gene87, Gene987, Gene679, Gene526, Gene452 </span></span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene352, Gene931, Gene570, Gene308, Gene444, Gene49, Gene707, Gene937, Gene736, Gene46 </span></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene834, Gene826, Gene914, Gene539, Gene738, Gene734, Gene382, Gene22, Gene971, Gene641 </span></span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene241, Gene429, Gene102, Gene542, Gene775, Gene796, Gene574, Gene517, Gene497, Gene52 </span></span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; PC_ 5 </span></span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Positive:  Gene65, Gene38, Gene459, Gene252, Gene391, Gene815, Gene260, Gene356, Gene276, Gene989 </span></span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene779, Gene670, Gene528, Gene20, Gene227, Gene712, Gene531, Gene474, Gene96, Gene912 </span></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene788, Gene909, Gene926, Gene2, Gene443, Gene437, Gene393, Gene849, Gene113, Gene647 </span></span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Negative:  Gene133, Gene814, Gene589, Gene108, Gene354, Gene584, Gene557, Gene786, Gene120, Gene514 </span></span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene427, Gene778, Gene137, Gene766, Gene541, Gene539, Gene89, Gene879, Gene693, Gene92 </span></span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     Gene582, Gene340, Gene407, Gene668, Gene52, Gene51, Gene220, Gene686, Gene417, Gene490</span></span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing nearest neighbor graph</span></span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Computing SNN</span></span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck</span></span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of nodes: 493</span></span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of edges: 21783</span></span>
+<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Running Louvain algorithm...</span></span>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Maximum modularity in 10 random starts: 0.4449</span></span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Number of communities: 4</span></span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Elapsed time: 0 seconds</span></span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------------</span></span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; All done!</span></span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="estimate-power-for-various-scenarios" class="section level1">
+<h1>Estimate power for various scenarios</h1>
+<p>Once the other necessary steps have been completed (minimally, 1. filter_counts 2. compute_data_summaries), the power_hierarchicell function can be used to estimate power for a variety of scenarios. This function can take some time, because it is analyzing each gene in the simulated data with linear mixed effects model. To save time, one can apply the pseudobulk methods from the type 1 error calculator (error_hierarchicell(method = “Pseudobulk_mean”)) and still obtain a reasonable approximation of power for a given fold change. However, if the numbers of cells per individual (ncells_variation_type) are modeled with a negative binomial where there is extreme imbalance this method will be underpowered.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimate power for 10 individuals per treatment group with a fold-change of 2 (aggregation methods)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="do">## </span><span class="al">NOTE</span><span class="do">: This will throw an error for using a fold-change not equal to 1, this is fine, because you are not using the tool in this instance to compute type 1 error.</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">identical</span>(<span class="fu">Sys.getenv</span>(<span class="st">&quot;NOT_CRAN&quot;</span>, <span class="at">unset =</span> <span class="st">&quot;true&quot;</span>), <span class="st">&quot;true&quot;</span>)) {</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">error_hierarchicell</span>(data_summ,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">&quot;Pseudobulk_mean&quot;</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                    <span class="at">n_genes =</span> <span class="dv">1000</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                    <span class="at">n_per_group =</span> <span class="dv">10</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cells_per_case =</span> <span class="dv">50</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cells_per_control =</span> <span class="dv">50</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">pval =</span> <span class="fl">0.05</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                    <span class="at">foldchange =</span> <span class="dv">2</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimate power for 10 individuals per treatment group with a fold-change of 2 (mixed models)</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="fu">error_hierarchicell</span>(data_summ,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">&quot;MAST_RE&quot;</span>,</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                    <span class="at">n_genes =</span> <span class="dv">1000</span>,</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>                    <span class="at">n_per_group =</span> <span class="dv">10</span>,</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cells_per_case =</span> <span class="dv">50</span>,</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cells_per_control =</span> <span class="dv">50</span>,</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>,</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>                    <span class="at">pval =</span> <span class="fl">0.05</span>,</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>                    <span class="at">foldchange =</span> <span class="dv">1</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="do">## Or:</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="fu">power_hierarchicell</span>(data_summ,</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>                    <span class="at">n_genes =</span> <span class="dv">1000</span>,</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>                    <span class="at">n_per_group =</span> <span class="dv">10</span>,</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cells_per_case =</span> <span class="dv">50</span>,</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>                    <span class="at">cells_per_control =</span> <span class="dv">50</span>,</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>                    <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>,</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>                    <span class="at">pval =</span> <span class="fl">0.05</span>,</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>                    <span class="at">foldchange =</span> <span class="dv">2</span>)</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimate power for 40 individuals with a continuous outcome (mean = 10, sd = 4) that is highly correlated to gene expression (rho = 0.99)</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="fu">power_hierarchicell_continuous</span>(data_summ,</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n_genes =</span> <span class="dv">1000</span>,</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n_individuals =</span> <span class="dv">20</span>,</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>                               <span class="at">cells_per_individual =</span> <span class="dv">50</span>,</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>,</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>                               <span class="at">rho =</span> <span class="fl">0.99</span>,</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>                               <span class="at">continuous_mean =</span> <span class="dv">10</span>,</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>                               <span class="at">continuous_sd =</span> <span class="dv">4</span>)</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="do">## Estimate power for 40 individuals with a continuous outcome that is moderately correlated to gene expression (rho = 0.6)</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a><span class="fu">power_hierarchicell_continuous</span>(data_summ,</span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n_genes =</span> <span class="dv">1000</span>,</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>                               <span class="at">n_individuals =</span> <span class="dv">20</span>,</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>                               <span class="at">cells_per_individual =</span> <span class="dv">50</span>,</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>                               <span class="at">ncells_variation_type =</span> <span class="st">&quot;Poisson&quot;</span>,</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a>                               <span class="at">rho =</span> <span class="fl">0.6</span>,</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>                               <span class="at">continuous_mean =</span> <span class="dv">10</span>,</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>                               <span class="at">continuous_sd =</span> <span class="dv">4</span>)</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Foldchange is not equal to 1, you are not simulating under the null.</span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; For type 1 error rates, please keep foldchange equal to 1</span></span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ----------------------------------------------</span></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Type 1 error for 0.05 is: 0.96437054631829</span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in vcov.merMod(object@fitD): variance-covariance matrix computed from finite-difference Hessian is</span></span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; not positive definite or contains NA values: falling back to var-cov estimated from RX</span></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in checkConv(attr(opt, &quot;derivs&quot;), opt$par, ctrl = control$checkConv, :</span></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Model failed to converge with max|grad| = 0.0240647 (tol = 0.002, component 1)</span></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Type 1 error for 0.05 is: 0.0597014925373134</span></span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done!</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Combining coefficients and standard errors</span></span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Calculating log-fold changes</span></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Calculating likelihood ratio tests</span></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Refitting on reduced model...</span></span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done!</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Continuous Power for 0.05 is: 0.992771084337349</span></span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hurdle Power for 0.05 is: 0.990361445783133</span></span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discrete Power for 0.05 is: 0.0657276995305164</span></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done!</span></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Combining coefficients and standard errors</span></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Calculating log-fold changes</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Calculating likelihood ratio tests</span></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Refitting on reduced model...</span></span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done!</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Continuous Power for 0.05 is: 1</span></span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hurdle Power for 0.05 is: 1</span></span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discrete Power for 0.05 is: 0.0794701986754967</span></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done!</span></span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Combining coefficients and standard errors</span></span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Calculating log-fold changes</span></span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Calculating likelihood ratio tests</span></span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Refitting on reduced model...</span></span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Done!</span></span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Continuous Power for 0.05 is: 0.962305986696231</span></span>
+<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Hurdle Power for 0.05 is: 0.860310421286031</span></span>
+<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Discrete Power for 0.05 is: 0.0676855895196507</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
