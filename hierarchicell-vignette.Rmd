@@ -1,6 +1,6 @@
 ---
 title: "Hierarchicell Vignette"
-author: "Kip D Zimmerman"
+author: "Kip D Zimmerman and Carl D. Langefeld"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -20,9 +20,9 @@ knitr::opts_chunk$set(
 This vignette is designed to teach users how to use the hierarchicell package to take a real preliminary single-cell RNA-seq dataset, simulate data that recapitulates the most important characteristics of that real data, and use that simulated data to estimate the power with a two-part hurdle mixed model. 
 
 ### The importance of hierarchicell
-Single-cell data has a hierarchical structure that is both intuitive and can also be seen empirically. Because of the shared genetic and environmental background that is shared among cells sampled from the same individual, it can be demonstrated that cells (of the same cell type) sampled from the same individual are more correlated than cells sampled from different individuals (Zimmerman et al., 2020). This is important because it means that single-cell data have a hierarchical structure that is rarely accounted for in the statistical analysis of single-cell data and in the study design of single-cell experiments. The manuscript titled "Pseudoreplication bias in single-cell studies; a practical solution" (Zimmerman et al., 2020) demonstrates why failing to account for the intra-individual correlation structure in single-cell RNA-seq studies leads to severely inflated type 1 error rates. However, the majority of single-cell's differential expression methods treat cells as if they were independent. Recently, more researchers have implemented methods that account for the correlation structure and have properly identified the true independent experimental unit (i.e., the individual rather than the cells) in their analyses. However, a vast majority of studies are still treating cells independently or have been designed in a manner (e.g., one independent sample per treatment group with 1000s of cells) that make proper statistical inference impossible. 
+Single-cell data has a hierarchical structure that is both intuitive and can also be seen empirically. Because of the shared genetic and environmental background that is shared among cells sampled from the same individual, it can be demonstrated that cells (of the same cell type) sampled from the same individual are more correlated than cells sampled from different individuals (Zimmerman et al., 2021). This is important because it means that single-cell data have a hierarchical structure that is rarely accounted for in the statistical analysis of single-cell data and in the study design of single-cell experiments. The manuscript titled "A practical solution to pseudoreplication bias in single-cell studies" (Zimmerman et al., 2021) demonstrates why failing to account for the intra-individual correlation structure in single-cell RNA-seq studies leads to severely inflated type 1 error rates. However, the majority of single-cell's differential expression methods treat cells as if they were independent. Recently, more researchers have implemented methods that account for the correlation structure and have properly identified the true independent experimental unit (i.e., the individual rather than the cells) in their analyses. However, a vast majority of studies are still treating cells independently or have been designed in a manner (e.g., one independent sample per treatment group with 1000s of cells) that make proper statistical inference impossible. 
 
-Other power calculators and simulation engines that currently exist simulate cells independently. They provide guidance about the number of cells that required to meet a certain power threshold. Here, we provide guidance about the number of independent individuals (as well as the number of cells nested within those individuals) that are needed to reach a certain power threshold. This distinction is extrememly important - thoughtfully assessing how many independent experimental samples (i.e., individuals) are needed for a study is critical to effective study design. 
+Other power calculators and simulation engines that currently exist simulate cells independently. They provide guidance about the number of cells that required to meet a certain power threshold. Here, we provide guidance about the number of independent individuals (as well as the number of cells nested within those individuals) that are needed to reach a certain power threshold. This distinction is extremely important - thoughtfully assessing how many independent experimental samples (i.e., individuals) are needed for a study is critical to effective study design. 
 
 ### Why mixed models?
 When a dataset contains multiple levels (i.e., a hierarchy) the variability can be split into between group variability and within group variability. With such data, units at the highest level (i.e., individuals) are the only truly independent units and treating any of the units of subsequent levels (i.e., cells) as independent is statistically inappropriate. There is a long body of literature that demonstrates that applying statistical inference to replicates that are not statistically independent without properly accounting for their correlation structure will inflate type 1 error rates and lead to spurious results. As the denominator of most statistical tests is a function of the variance, not accounting for the positive correlation among sampling units underestimates the true standard error and leads to false positives.  In addition, treating each replicate as independent inflates the test degrees of freedom, making it easier to falsely reject the null hypothesis. 
@@ -110,7 +110,7 @@ sample identifiers as possible. If you are inputing data that has less than
 5 unique values for sample identifier (i.e., independent experimental units), 
 then the empirical estimation of the inter-individual heterogeneity is going to 
 be very unstable. Finding such a dataset will be difficult at this time, but, 
-over time (as experiments grow in sample size and the numbers of publically 
+over time (as experiments grow in sample size and the numbers of publicly 
 available single-cell RNAseq datasets increase), this should improve dramatically.
 
 If you do not have a preliminary dataset you would like to use, running the 
@@ -119,7 +119,7 @@ load a default dataset of pancreatic alpha cells. This a reasonable starting
 place for researchers looking to simply get an idea of power for their study. 
 
 ```{r}
-## Run hierarchicells filter_counts function to filter and prepare for next steps
+## Run hierarchicell's filter_counts function to filter and prepare for next steps
 
 gene_counts_filtered <- hierarchicell::filter_counts()
 gene_counts_filtered[1:5,1:5]
@@ -260,7 +260,7 @@ error_hierarchicell(data_summ,
                     cells_per_control = 50,
                     ncells_variation_type = "Poisson",
                     pval = 0.05,
-                    foldchange = 1)
+                    foldchange = 2)
 
 ## Or:
 
